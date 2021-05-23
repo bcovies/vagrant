@@ -1,0 +1,48 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Instalação openjdk-8-jdk-headless"
+      become: true
+      apt:
+        name: ["openjdk-8-jdk-headless"]
+        state: latest
+
+    - name: "Confirma se o openjdk-8-jdk-headless"
+      become: true
+      apt:
+        name: openjdk-8-jdk-headless
+        state: present
+
+    - name: "Baixa os arquivos"
+      become: true
+      shell: cd ~ && sudo wget https://packages.rundeck.com/pagerduty/rundeck/packages/any/any/rundeck_3.3.11.20210507-1_all.deb/download.deb
+
+    - name: "Instala do rundeck"
+      become: true
+      shell: cd ~ && dpkg -i download.deb
+
+    - name: "Comenta linha de filesystem no rundeck"
+      become: true
+      shell: sed -i '/projectsStorageType/s/^/#/g' /etc/rundeck/rundeck-config.properties
+
+    - name: "Adiciona o hostname no arquivo"
+      become: true
+      shell: echo "rundeck.projectsStorageType=filesystem" >> /etc/rundeck/rundeck-config.properties
+
+    - name: "Comenta linha de host no rundeck"
+      become: true
+      shell: sed -i '/localhost/s/^/#/g' /etc/rundeck/rundeck-config.properties
+
+    - name: "Adiciona o hostname no arquivo"
+      become: true
+      shell: echo "grails.serverURL=http://rundeck.dns.br" >> /etc/rundeck/rundeck-config.properties
+
+    - name: "Reinicia o serviço"
+      become: true
+      shell: service rundeckd restart
+    
+    - name: "Enable no serviço"
+      become: true
+      shell: systemctl enable rundeckd

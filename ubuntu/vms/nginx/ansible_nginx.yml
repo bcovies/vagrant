@@ -1,0 +1,37 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Update nos pacotes do ubuntu"
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+    - name: "Instalação do nginx"
+      become: true
+      apt:
+        name: ["nginx"]
+        state: latest
+
+    - name: "Confirma se o nginx está instalado"
+      become: true
+      apt:
+        name: nginx
+        state: present
+
+    - name: "Copia os arquivos para a pasta"
+      become: true
+      shell: cp -a /vagrant/nginx/conf.d/reverse-proxy.conf /etc/nginx/conf.d/
+
+    - name: Habilita o serviço nginx
+      systemd:
+        name: nginx
+        enabled: yes
+        masked: no
+    - name: Certifica-se que o nginx está ativo
+      systemd:
+        state: started
+        name: nginx

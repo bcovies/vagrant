@@ -1,0 +1,55 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Instalação apache2"
+      become: true
+      apt:
+        name: ["apache2"]
+        state: latest
+
+    - name: "Confirma se o apache2"
+      become: true
+      apt:
+        name: apache2
+        state: present
+
+    - name: "Instalação zip"
+      become: true
+      apt:
+        name: ["zip"]
+        state: latest
+
+    - name: "Confirma se o zip"
+      become: true
+      apt:
+        name: zip
+        state: present
+    
+    # - name: "Copia"
+    #   become: true
+    #   shell: "chmod +x /vagrant/vpn/openvpn-install.sh"
+
+    # - name: "executa"
+    #   become: true
+    #   expect: 
+    #     command: bash /vagrant/vpn/openvpn-install.sh
+    #     responses:
+    #       # "Which IPv4 address should be used?",
+    #       # "     1) 10.0.2.15",
+    #       # "     2) 10.1.1.5",
+    #       # "IPv4 address [1]: 2" : "2\n"
+    #       "(.*)IPv4 address(.*)" : "2\n"
+    #       "(.*)hostname(.*):" : "\n"
+    #       "(.*)Protocol(.*)" : "\n"
+    #       "(.*)Port(.*)" : "\n"
+    #       "(.*)DNS server(.*)" : "\n"
+    #       # "(.*)Name(.*)" : "\n"
+    #     timeout: 30
+    #     # echo: yes
+    #   register: prompt
+    # - debug:
+    #     var: prompt.stdout_lines
+          
+

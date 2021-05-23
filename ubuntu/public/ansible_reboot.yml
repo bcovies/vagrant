@@ -1,0 +1,8 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Reinicia a máquina para aplicar as alterações"
+      become: true
+      shell:  reboot

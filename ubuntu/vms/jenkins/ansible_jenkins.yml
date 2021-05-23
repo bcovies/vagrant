@@ -1,0 +1,32 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Instalação do openjdk-11-jdk"
+      become: true
+      apt:
+        name: ["openjdk-11-jdk"]
+        state: latest
+
+    - name: "Confirma se o openjdk-11-jdk está instalado"
+      become: true
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: "Baixa os arquivos"
+      become: true
+      shell: wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+
+    - name: "Instala do os arquivos para o jenkins"
+      become: true
+      shell: sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ >  /etc/apt/sources.list.d/jenkins.list'
+
+    - name: "update nos repositórios"
+      become: true
+      shell: sudo apt-get update
+
+    - name: "Instala o jenkins"
+      become: true
+      shell: sudo apt-get install -y jenkins

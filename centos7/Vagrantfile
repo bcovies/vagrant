@@ -1,0 +1,112 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/centos7"
+   
+    #Update nos repositórios do CENTOS7
+    config.vm.provision "shell", inline: "sudo yum update -y"
+    #Instala o Ansible para provisionamento da máquina
+    config.vm.provision "shell", inline: "sudo yum install -y ansible"
+    #Compartilha a pasta ./public para /vagrant
+    config.vm.synced_folder "./public", "/vagrant/public", type: 'virtualbox'
+    #Desabilita o compartilhamento geral da pasta atual
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+
+    #docker_manager
+    config.vm.define "docker_manager" do |docker_manager|
+      # Compartilha a pasta de instalação
+      docker_manager.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      # Configurações Virtualbox guest ISO
+      docker_manager.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_manager.vbguest.auto_update = false
+      docker_manager.vbguest.no_remote = true
+      # Configurações da Máquina virtual
+      docker_manager.vm.network "public_network", ip: "10.1.1.20"
+      docker_manager.vm.provider "virtualbox" do |v|     
+            v.memory= 1024
+            v.cpus = 1
+            v.name = "docker_manager"
+      end
+      # Define o nome do hostname
+      docker_manager.vm.provision "shell", inline: "echo docker_manager > /etc/hostname"
+      # Cria o usuário 'dev'
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      # Atualiza o DNS
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
+      # Instala os pacotes desejados
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      # Reinicia para completar a instalação
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #docker_worker_1
+    config.vm.define "docker_worker_1" do |docker_worker_1|
+      # Compartilha a pasta de instalação
+      docker_worker_1.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      # Configurações Virtualbox guest ISO
+      docker_worker_1.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_worker_1.vbguest.auto_update = false
+      docker_worker_1.vbguest.no_remote = true
+      # Configurações da Máquina virtual
+      #docker_worker_1.check_guest_additions = false
+      docker_worker_1.vm.network "public_network", ip: "10.1.1.21"
+      docker_worker_1.vm.provider "virtualbox" do |v|     
+            v.memory= 1024
+            v.cpus = 1
+            v.name = "docker_worker_1"
+      end
+      # Define o nome do hostname
+      docker_worker_1.vm.provision "shell", inline: "echo docker_worker_1 > /etc/hostname"
+      # Cria o usuário 'dev'
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      # Atualiza o DNS
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
+      # Instala os pacotes desejados
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      # Reinicia para completar a instalação
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #docker_worker_2
+    config.vm.define "docker_worker_2" do |docker_worker_2|
+      # Compartilha a pasta de instalação
+      docker_worker_2.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      # Configurações Virtualbox guest ISO
+      docker_worker_2.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_worker_2.vbguest.auto_update = false
+      docker_worker_2.vbguest.no_remote = true
+      # Configurações da Máquina virtual
+      #docker_worker_2.check_guest_additions = false
+      docker_worker_2.vm.network "public_network", ip: "10.1.1.22"
+      docker_worker_2.vm.provider "virtualbox" do |v|     
+            v.memory= 1024
+            v.cpus = 1
+            v.name = "docker_worker_2"
+      end
+      # Define o nome do hostname
+      docker_worker_2.vm.provision "shell", inline: "echo docker_worker_2 > /etc/hostname"
+      # Cria o usuário 'dev'
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      # Atualiza o DNS
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
+      # Instala os pacotes desejados
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      # Reinicia para completar a instalação
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+    #K8S
+    # config.vm.define "k8s" do |k8s|
+    #   k8s.vbguest.installer_options = { allow_kernel_upgrade: true }
+    #   k8s.vbguest.auto_update = false
+    #   k8s.vbguest.no_remote = true
+    #   k8s.vm.network "public_network", ip: "10.1.1.40"
+    #   k8s.vm.provision "shell", inline: "echo k8s > /etc/hostname"
+    #   k8s.vm.provider "virtualbox" do |v|     
+    #           v.memory= 512
+    #           v.cpus = 1
+    #           v.name = "k8s"
+    #   end
+    #   k8s.vm.provision "shell", inline: "cd /vagrant/ && ansible-playbook provisioning.yml"
+    # end
+  end
+
+
+

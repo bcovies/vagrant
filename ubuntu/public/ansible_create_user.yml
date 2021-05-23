@@ -1,0 +1,34 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+  - name: Add the user 'dev' with a bash shell, appending the group 'sudo' to the user's groups
+    user:
+      name: dev
+      shell: /bin/bash
+      groups: sudo
+      append: yes
+
+  - name: Set authorized key taken from file
+    authorized_key:
+      user: dev
+      state: present
+      key: "{{ lookup('file', '/vagrant/public/.ssh/id_rsa.pub') }}"
+
+  - name: Copy ssh files to user home space
+    copy:
+      src: /vagrant/public/.ssh/id_rsa
+      dest: /home/dev/.ssh/id_rsa
+      owner: dev
+      group: dev
+      mode: '0400'
+
+  - name: Copy ssh files to user home space
+    copy:
+      src: /vagrant/public/.ssh/id_rsa.pub
+      dest: /home/dev/.ssh/id_rsa.pub
+      owner: dev
+      group: dev
+      mode: '0400'
+  

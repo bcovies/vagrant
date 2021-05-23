@@ -1,0 +1,42 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+  - name: Adiciona o usuário 'dev', e o inclui ao grupo 'sudo'
+    user:
+      name: dev
+      shell: /bin/bash
+      groups: wheel
+      append: yes
+  
+  - name: Cria a pasta .ssh do usuário dev
+    become: true
+    shell: "mkdir -p /home/dev/.ssh"
+  
+  - name: Permissões para a pasta .ssh do usuário dev
+    become: true
+    shell: "chown -R dev:dev /home/dev/.ssh"
+  
+  - name: Adiciona a chave privada ao espaço do usuário 'dev'
+    copy:
+      src: /vagrant/public/.ssh/id_rsa
+      dest: /home/dev/.ssh/id_rsa
+      owner: dev
+      group: dev
+      mode: '0400'
+
+  - name: Adiciona a chave pública no espaço do usuário 'dev'
+    copy:
+      src: /vagrant/public/.ssh/id_rsa.pub
+      dest: /home/dev/.ssh/id_rsa.pub
+      owner: dev
+      group: dev
+      mode: '0400'
+  
+  - name: Adiciona a chave pública de 'dev' a lista de usuários autorizados
+    authorized_key:
+      user: dev
+      state: present
+      key: "{{ lookup('file', '/vagrant/public/.ssh/id_rsa.pub') }}"
+

@@ -1,0 +1,35 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/alpine38"
+   
+    config.vm.provision "shell", inline: "apk update"
+    config.vm.provision "shell", inline: "apk add ansible"
+    config.vm.synced_folder ".", "/vagrant", type: 'virtualbox'
+    config.vbguest.installer_options = { allow_kernel_upgrade: true }
+    config.vbguest.auto_update = false
+    config.vbguest.no_remote = true
+
+    config.vm.define "docker_worker_1" do |docker_worker_1|
+     
+      docker_worker_1.vm.network "public_network", ip: "10.1.1.22"
+      docker_worker_1.vm.provider "virtualbox" do |v|     
+        docker_worker_1.vm.provision "shell", inline: "echo alpine-worker-1 > /etc/hostname"
+            v.memory= 512
+            v.cpus = 1
+            v.name = "docker_worker_1"
+        end
+        docker_worker_1.vm.provision "shell", inline: "cd /vagrant/ && ansible-playbook provisioning.yml"
+    end
+    
+    config.vm.define "docker_worker_2" do |docker_worker_2|
+     
+      docker_worker_2.vm.network "public_network", ip: "10.1.1.22"
+      docker_worker_2.vm.provider "virtualbox" do |v|     
+        docker_worker_2.vm.provision "shell", inline: "echo alpine-worker-2 > /etc/hostname"
+            v.memory= 512
+            v.cpus = 1
+            v.name = "docker_worker_2"
+        end
+        docker_worker_2.vm.provision "shell", inline: "cd /vagrant/ && ansible-playbook provisioning.yml"
+    end
+  
+  end

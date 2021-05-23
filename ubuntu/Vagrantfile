@@ -1,0 +1,140 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+   
+    #Update nos repositórios do ubuntu 20.04
+    config.vm.provision "shell", inline: "sudo apt update -y"
+    #Instala o Ansible para provisionamento da máquina
+    config.vm.provision "shell", inline: "sudo apt install -y ansible"
+    #Compartilha a pasta ./public para /vagrant
+    config.vm.synced_folder "./public", "/vagrant/public", type: 'virtualbox'
+    #Desabilita o compartilhamento geral da pasta atual
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+
+    #Copia todos os arquivos da pasta /vagrant para o home do vagrant da máquina específica
+    #config.vm.provision "shell", inline: "cp -a /vagrant/* /home/vagrant"
+    
+    #DNS
+    config.vm.define "dns" do |dns|
+      dns.vm.provision "shell", inline: "echo dns > /etc/hostname"
+      dns.vm.synced_folder "./vms/dns", "/vagrant/dns", type: 'virtualbox'
+      dns.vbguest.installer_options = { allow_kernel_upgrade: true }
+      dns.vbguest.auto_update = false
+      dns.vbguest.no_remote = true
+      dns.vm.network "public_network", ip: "10.1.1.3"
+      dns.vm.provider "virtualbox" do |v|     
+        v.memory= 512
+        v.cpus = 1
+        v.name = "dns"
+      end
+      #Executa a automação do ansible
+      dns.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      dns.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      dns.vm.provision "shell", inline: "ansible-playbook /vagrant/dns/ansible_bind9.yml"
+      dns.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #NGINX
+    config.vm.define "nginx" do |nginx|
+      nginx.vm.provision "shell", inline: "echo nginx > /etc/hostname"
+      nginx.vm.synced_folder "./vms/nginx", "/vagrant/nginx", type: 'virtualbox'
+      nginx.vbguest.installer_options = { allow_kernel_upgrade: true }
+      nginx.vbguest.auto_update = false
+      nginx.vbguest.no_remote = true
+      nginx.vm.network "public_network", ip: "10.1.1.4"
+      nginx.vm.provider "virtualbox" do |v|     
+        v.memory= 512
+        v.cpus = 1
+        v.name = "nginx"
+      end
+      #Executa a automação do ansible
+      nginx.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      nginx.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      nginx.vm.provision "shell", inline: "ansible-playbook /vagrant/nginx/ansible_nginx.yml"
+      nginx.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #JENKINS
+    config.vm.define "jenkins" do |jenkins|
+      jenkins.vm.provision "shell", inline: "echo jenkins > /etc/hostname"
+      jenkins.vm.synced_folder "./vms/jenkins", "/vagrant/jenkins", type: 'virtualbox'
+      jenkins.vbguest.installer_options = { allow_kernel_upgrade: true }
+      jenkins.vbguest.auto_update = false
+      jenkins.vbguest.no_remote = true
+      jenkins.vm.network "public_network", ip: "10.1.1.30"
+      jenkins.vm.provider "virtualbox" do |v|
+        v.check_guest_additions = false
+        v.memory= 4096
+        v.cpus = 1
+        v.name = "jenkins"
+        end
+        #Executa a automação do ansible
+        jenkins.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+        jenkins.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+        jenkins.vm.provision "shell", inline: "ansible-playbook /vagrant/jenkins/ansible_jenkins.yml"
+        jenkins.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #RUNDECK
+    config.vm.define "rundeck" do |rundeck|
+      rundeck.vm.provision "shell", inline: "echo rundeck > /etc/hostname"
+      rundeck.vm.synced_folder "./vms/rundeck", "/vagrant/rundeck", type: 'virtualbox'
+      rundeck.vbguest.installer_options = { allow_kernel_upgrade: true }
+      rundeck.vbguest.auto_update = false
+      rundeck.vbguest.no_remote = true
+      rundeck.vm.network "public_network", ip: "10.1.1.32"
+      rundeck.vm.provider "virtualbox" do |v|
+        v.check_guest_additions = false
+        v.memory= 2048
+        v.cpus = 1
+        v.name = "rundeck"
+      end  
+      #Executa a automação do ansible
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/rundeck/ansible_rundeck.yml"
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/rundeck/ansible_rundeck_ssh.yml"
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/rundeck/ansible_rundeck_nodes.yml"
+      rundeck.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+
+    #vpn
+    config.vm.define "vpn" do |vpn|
+      vpn.vm.provision "shell", inline: "echo vpn > /etc/hostname"
+      vpn.vm.synced_folder "./vms/vpn", "/vagrant/vpn", type: 'virtualbox'
+      vpn.vbguest.installer_options = { allow_kernel_upgrade: true }
+      vpn.vbguest.auto_update = false
+      vpn.vbguest.no_remote = true
+      vpn.vm.network "public_network", ip: "10.1.1.5"
+      vpn.vm.provider "virtualbox" do |v|     
+        v.memory= 512
+        v.cpus = 1
+        v.name = "vpn"
+      end
+      #Executa a automação do ansible
+      vpn.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      vpn.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      vpn.vm.provision "shell", inline: "ansible-playbook /vagrant/vpn/ansible_vpn.yml"
+      vpn.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+    
+    #GITLAB
+    config.vm.define "gitlab" do |gitlab|
+      gitlab.vm.provision "shell", inline: "echo gitlab > /etc/hostname"
+      gitlab.vm.synced_folder "./vms/gitlab", "/vagrant/gitlab", type: 'virtualbox'
+      gitlab.vbguest.installer_options = { allow_kernel_upgrade: true }
+      gitlab.vbguest.auto_update = false
+      gitlab.vbguest.no_remote = true
+      gitlab.vm.network "public_network", ip: "10.1.1.31"
+      gitlab.vm.provider "virtualbox" do |v|
+        v.check_guest_additions = false
+        v.memory= 4096
+        v.cpus = 1
+        v.name = "gitlab"
+      end
+      #Executa a automação do ansible
+      gitlab.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      gitlab.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      gitlab.vm.provision "shell", inline: "ansible-playbook /vagrant/gitlab/ansible_gitlab.yml"
+      gitlab.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end
+  end

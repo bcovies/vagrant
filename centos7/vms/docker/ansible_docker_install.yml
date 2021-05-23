@@ -1,0 +1,41 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Adiciona o repositório docker"
+      become: true
+      shell:  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    - name: "Instalação do docker-ce, docker-ce-cli, containerd.io"
+      become: true
+      yum:
+        name: ["docker-ce", "docker-ce-cli", "containerd.io"]
+        state: latest
+
+    - name: "Confirma se o  docker-ce, docker-ce-cli, containerd.io está instalado"
+      become: true
+      yum:
+        name:  ["docker-ce", "docker-ce-cli", "containerd.io"]
+        state: present
+
+    - name: Habilita o serviço docker
+      systemd:
+        name: docker
+        enabled: yes
+        masked: no
+    - name: Certifica-se que o docker está ativo
+      systemd:
+        state: started
+        name: docker
+
+    # - name: "Start no serviço docker"
+    #   become: true
+    #   shell:  systemctl start docker
+
+    # - name: "Start no serviço docker"
+    #   become: true
+    #   shell:  systemctl enable docker
+    # - name: "Adiciona o usuario vagrant ao grupo docker"
+    #   become: true
+    #   shell:  usermod -aG docker vagrant
