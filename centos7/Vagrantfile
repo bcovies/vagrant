@@ -9,7 +9,9 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "./public", "/vagrant/public", type: 'virtualbox'
     #Desabilita o compartilhamento geral da pasta atual
     config.vm.synced_folder ".", "/vagrant", disabled: true
-
+    # Mentioning the SSH Username/Password:
+    # config.ssh.username = "vagrant"
+    # config.ssh.password = "vagrant"
     #docker_manager
     config.vm.define "docker_manager" do |docker_manager|
       # Compartilha a pasta de instalação
@@ -33,6 +35,9 @@ Vagrant.configure("2") do |config|
       docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
       # Instala os pacotes desejados
       docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
       # Reinicia para completar a instalação
       docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
     end
@@ -61,6 +66,9 @@ Vagrant.configure("2") do |config|
       docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
       # Instala os pacotes desejados
       docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
       # Reinicia para completar a instalação
       docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
     end
@@ -89,6 +97,9 @@ Vagrant.configure("2") do |config|
       docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_centos_dns.yml"
       # Instala os pacotes desejados
       docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
       # Reinicia para completar a instalação
       docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
     end

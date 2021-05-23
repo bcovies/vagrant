@@ -18,24 +18,3 @@
       yum:
         name:  ["docker-ce", "docker-ce-cli", "containerd.io"]
         state: present
-
-    - name: Habilita o serviço docker
-      systemd:
-        name: docker
-        enabled: yes
-        masked: no
-    - name: Certifica-se que o docker está ativo
-      systemd:
-        state: started
-        name: docker
-
-    # - name: "Start no serviço docker"
-    #   become: true
-    #   shell:  systemctl start docker
-
-    # - name: "Start no serviço docker"
-    #   become: true
-    #   shell:  systemctl enable docker
-    # - name: "Adiciona o usuario vagrant ao grupo docker"
-    #   become: true
-    #   shell:  usermod -aG docker vagrant
