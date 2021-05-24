@@ -13,6 +13,75 @@ Vagrant.configure("2") do |config|
     #Copia todos os arquivos da pasta /vagrant para o home do vagrant da máquina específica
     #config.vm.provision "shell", inline: "cp -a /vagrant/* /home/vagrant"
     
+    
+    # Docker
+    config.vm.define "docker_manager" do |docker_manager|
+      docker_manager.vm.provision "shell", inline: "echo docker_manager > /etc/hostname"
+      docker_manager.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      docker_manager.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_manager.vbguest.auto_update = false
+      docker_manager.vbguest.no_remote = true
+      docker_manager.vm.network "public_network", ip: "10.1.1.20"
+      docker_manager.vm.provider "virtualbox" do |v|     
+        v.memory= 2048
+        v.cpus = 1
+        v.name = "docker_manager"
+      end
+      #Executa a automação do ansible
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_manager.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end    
+    # Docker
+    config.vm.define "docker_worker_1" do |docker_worker_1|
+      docker_worker_1.vm.provision "shell", inline: "echo docker_worker_1 > /etc/hostname"
+      docker_worker_1.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      docker_worker_1.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_worker_1.vbguest.auto_update = false
+      docker_worker_1.vbguest.no_remote = true
+      docker_worker_1.vm.network "public_network", ip: "10.1.1.21"
+      docker_worker_1.vm.provider "virtualbox" do |v|     
+        v.memory= 2048
+        v.cpus = 1
+        v.name = "docker_worker_1"
+      end
+      #Executa a automação do ansible
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_1.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end    
+
+    # Docker
+    config.vm.define "docker_worker_2" do |docker_worker_2|
+      docker_worker_2.vm.provision "shell", inline: "echo docker_worker_2 > /etc/hostname"
+      docker_worker_2.vm.synced_folder "./vms/docker", "/vagrant/docker", type: 'virtualbox'
+      docker_worker_2.vbguest.installer_options = { allow_kernel_upgrade: true }
+      docker_worker_2.vbguest.auto_update = false
+      docker_worker_2.vbguest.no_remote = true
+      docker_worker_2.vm.network "public_network", ip: "10.1.1.22"
+      docker_worker_2.vm.provider "virtualbox" do |v|     
+        v.memory= 2048
+        v.cpus = 1
+        v.name = "docker_worker_2"
+      end
+      #Executa a automação do ansible
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_netplan.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_create_user.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_install.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_daemon.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/docker/ansible_docker_servico.yml"
+      docker_worker_2.vm.provision "shell", inline: "ansible-playbook /vagrant/public/ansible_reboot.yml"
+    end    
+
     #DNS
     config.vm.define "dns" do |dns|
       dns.vm.provision "shell", inline: "echo dns > /etc/hostname"

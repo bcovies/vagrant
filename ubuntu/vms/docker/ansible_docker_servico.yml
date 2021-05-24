@@ -1,0 +1,20 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: Habilita o serviço docker
+      become: true
+      shell: systemctl enable docker.service
+
+    - name: Habilita o serviço docker
+      become: true
+      shell: systemctl enable containerd.service
+
+    - name: Habilita o serviço docker
+      become: true
+      shell: systemctl daemon-reload
+
+    - name: Habilita o serviço docker
+      become: true
+      shell: systemctl restart docker.service

@@ -1,0 +1,29 @@
+# ---
+# - name: Definição localhost
+#   hosts: localhost
+#   connection: local 
+#   tasks:
+#   - name: "Docker daemon"
+#     become: true
+#     shell: cp -a /vagrant/docker/daemon.json /etc/docker/
+  
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    - name: "Cria o caminho"
+      become: true
+      shell:  mkdir -p /etc/systemd/system/docker.service.d/
+
+    - name: "Copia o arquivo override.conf"
+      become: true
+      shell:  cp -a /vagrant/docker/override.conf /etc/systemd/system/docker.service.d/
+
+    - name: "Reload no daemon"
+      become: true
+      shell: systemctl daemon-reload
+
+    - name: "Restart no serviço docker"
+      become: true
+      shell: systemctl restart docker.service
