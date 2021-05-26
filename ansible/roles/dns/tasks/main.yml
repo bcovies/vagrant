@@ -1,0 +1,18 @@
+---
+- name: Copy netplan
+  become: yes
+  copy:
+    src: files/netplan.yaml
+    dest: /tmp/netplan.yaml
+    owner: ubuntu
+    group: ubuntu
+    mode: '0700'
+
+- name: "WORKAROUND(1): Adiciona Gateway e DNS servers"
+  become: true
+  shell: cat  /tmp/netplan.yaml >> /etc/netplan/50-vagrant.yaml; chattr +i /etc/netplan/50-vagrant.yaml
+
+
+- name: "WORKAROUND(2): Apply"
+  become: true
+  shell: netplan --debug  apply
