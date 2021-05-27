@@ -6,7 +6,7 @@ localhost:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 docker_manager:
@@ -17,7 +17,7 @@ docker_manager:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 docker_worker_1:
@@ -28,7 +28,7 @@ docker_worker_1:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 docker_worker_2:
@@ -39,7 +39,7 @@ docker_worker_2:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 jenkins:
@@ -50,7 +50,7 @@ jenkins:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 gitlab:
@@ -61,7 +61,7 @@ gitlab:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 proxyreverse:
@@ -72,7 +72,7 @@ proxyreverse:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''
 
 vpn:
@@ -83,5 +83,5 @@ vpn:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: ubuntu
+  username: centos
   tags: ''

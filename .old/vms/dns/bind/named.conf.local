@@ -1,9 +1,0 @@
-zone    "dns.br" {
-        type master;
-        file "/etc/bind/forward.dns.br";
-};
-
-zone    "1.1.10.in-addr.arpa" {
-        type master;
-        file "/etc/bind/reverse.dns.br";		
-};

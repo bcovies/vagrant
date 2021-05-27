@@ -1,0 +1,33 @@
+---
+- name: Definição localhost
+  hosts: localhost
+  connection: local 
+  tasks:
+    
+    - name: "Instalação do curl openssh-server ca-certificates tzdata perl"
+      become: true
+      apt:
+        name: ["curl", "openssh-server", "ca-certificates", "tzdata", "perl"]
+        state: latest
+
+    - name: "Copia os arquivos para a pasta"
+      become: true
+      shell: echo 'postfix postfix/mailname string gitlabroot.com' | debconf-set-selections
+
+    - name: "Copia os arquivos para a pasta"
+      become: true
+      shell: echo 'postfix postfix/main_mailer_type string Internet Site' | debconf-set-selections
+
+    - name: "Instalação do postfix"
+      become: true
+      apt:
+        name: ["postfix"]
+        state: latest
+    
+    - name: "Baixa o script de instalação do gitlab"
+      become: true
+      shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh |  bash
+
+    - name: "Instalação do gitlab"
+      become: true
+      shell:  EXTERNAL_URL='https://gitlab.vm.dns.br'  apt-get install gitlab-ee

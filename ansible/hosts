@@ -1,4 +1,0 @@
-[dockermgr]
-dockermgr.vm.dns.br     ansible_user=vagrant ansible_ssh_private_key_file="/mnt/hdd/vagrant_ansible_deploy/ubuntu/docker/.vagrant/machines/manager/virtualbox/private_key"
-[dockerwkr01]
-dockerwkr01.vm.dns.br   ansible_user=vagrant ansible_ssh_private_key_file="/mnt/hdd/vagrant_ansible_deploy/ubuntu/docker/.vagrant/machines/worker/virtualbox/private_key"
