@@ -1,0 +1,13 @@
+---
+- hosts: dockerwkr01
+  roles:
+    - user
+    - dns
+    - docker
+
+- hosts: dockerwkr02
+  roles:
+    - user
+    - dns
+    - docker
+    
