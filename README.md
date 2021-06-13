@@ -28,10 +28,12 @@ Tal infra conta com DNS e Proxy Reverso instalado com bases neste repositório: 
 
 
 ## Atenção!!
-O instalador possui alterações EM:
- - Usuário
- - DNS
- - ssh
+
+Preste atenção nos itens abaixo, há modificações que podem travar o seu instalador. Para evitar isto, separei alguns pontos que ou irão faltar ou alterar de acordo com seu ambiente (IP,DNS,Usuário etc)
+
+SSH: Colocar authorized_keys, id_rsa, id_rsa.pub em
+
+    vagrant_ansible_deploy/ansible/centos/roles/user/files/.ssh
 
 ## Ubuntu:
 Usuário: ubuntu
@@ -81,9 +83,6 @@ Altere pelo seu IP
 
  ```   
  
-SSH: Colocar authorized_keys, id_rsa, id_rsa.pub em
-
-    vagrant_ansible_deploy/ansible/centos/roles/user/files/.ssh
 
 Hosts:
 
