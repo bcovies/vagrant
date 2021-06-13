@@ -36,6 +36,13 @@ SSH: Colocar authorized_keys, id_rsa, id_rsa.pub em
     vagrant_ansible_deploy/ansible/centos/roles/user/files/.ssh
 
 
+Hosts:
+
+Cuidado, pois, não está sendo referenciado o IP e sim o DNS, altere, se necessário em:
+
+    vagrant_ansible_deploy/ansible/ubuntu/hosts
+
+
 ## Ubuntu:
 Usuário: ubuntu
 
@@ -56,13 +63,6 @@ Altere pelo seu IP
   Path: 
   
     vagrant_ansible_deploy/ansible/ubuntu/roles/docker/files/override.conf
-
-Hosts:
-
-Cuidado, pois, não está sendo referenciado o IP e sim o DNS, altere, se necessário em:
-
-    vagrant_ansible_deploy/ansible/ubuntu/hosts
-
 
 ## Centos
 
