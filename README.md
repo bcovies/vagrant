@@ -24,7 +24,7 @@ Este repositório conta com a seguinte estrutura:
  ---------------           ---------------            ---------------           ---------------           ---------------           --------------- 
 ```
 
-Tal infra conta com DNS e Proxy Reverso instalado com bases neste repositório: <>.
+Tal infra conta com DNS e Proxy Reverso instalado com bases neste repositório: https://github.com/bcovies/ansible 
 
 
 ## Atenção!!
@@ -34,6 +34,7 @@ Preste atenção nos itens abaixo, há modificações que podem travar o seu ins
 SSH: Colocar authorized_keys, id_rsa, id_rsa.pub em
 
     vagrant_ansible_deploy/ansible/centos/roles/user/files/.ssh
+
 
 ## Ubuntu:
 Usuário: ubuntu
@@ -56,10 +57,6 @@ Altere pelo seu IP
   
     vagrant_ansible_deploy/ansible/ubuntu/roles/docker/files/override.conf
 
-SSH: Colocar authorized_keys, id_rsa, id_rsa.pub em
-
-    vagrant_ansible_deploy/ansible/ubuntu/roles/user/files/.ssh
-
 Hosts:
 
 Cuidado, pois, não está sendo referenciado o IP e sim o DNS, altere, se necessário em:
@@ -77,9 +74,9 @@ Altere pelo seu IP
    vagrant_ansible_deploy/ansible/centos/roles/common/tasks/main.yml
 
    # DNS
-- name: "[WORKAROUND (CENTOS 8)]: Altera o DNS da máquina"
-  become: true
-  shell: echo "nameserver 192.168.1.200" > /etc/resolv.conf; echo "nameserver 192.168.1.254" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
+    - name: "[WORKAROUND (CENTOS 8)]: Altera o DNS da máquina"
+      become: true
+      shell: echo "nameserver 192.168.1.200" > /etc/resolv.conf; echo "nameserver 192.168.1.254" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
 
  ```   
  
