@@ -1,0 +1,8 @@
+---
+- hosts: pwserver
+  roles:
+    - user
+    - dns
+    - docker
+
+    
