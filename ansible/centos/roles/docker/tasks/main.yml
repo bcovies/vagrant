@@ -11,6 +11,12 @@
   become: true
   shell: yum update -y
 
+- name: Instalando pacotes básicos para o servidor.
+  become: true
+  yum:
+    state: latest
+    name: [ "epel-release", "yum-utils", "dkms","kernel-devel" ]
+
 - name: "Install Docker Engine"
   become: true
   yum: 

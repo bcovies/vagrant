@@ -7,6 +7,5 @@ dockerwkr01.vm.dns.br   ansible_user=vagrant ansible_ssh_private_key_file="/mnt/
 [dockerwkr02]
 dockerwkr02.vm.dns.br   ansible_user=vagrant ansible_ssh_private_key_file="/mnt/hdd/vagrant_ansible_deploy/vm/.vagrant/machines/worker02/virtualbox/private_key"
 
-
 [pwserver]
-192.168.1.100   ansible_user=vagrant ansible_ssh_private_key_file="/mnt/hdd/git/vagrant_ansible_deploy/vm/.vagrant/machines/pwserver/virtualbox/private_key"
+dockerpw.vm.dns.br   ansible_user=vagrant ansible_ssh_private_key_file="/mnt/hdd/git/vagrant_ansible_deploy/vm/.vagrant/machines/pwserver/virtualbox/private_key"
