@@ -47,3 +47,16 @@
 - name: "Adiciona usuário centos ao grupo docker"
   become: true
   shell: usermod -aG docker centos
+
+- name: "Baixa docker-compose 1.29.2"
+  become: true
+  shell: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+- name: "Chmod"
+  become: true
+  shell: chmod +x /usr/local/bin/docker-compose
+
+- name: "Baixa docker-compose 1.29.2"
+  become: true
+  shell: ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
