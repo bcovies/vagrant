@@ -1,7 +1,0 @@
----
-- hosts: pwserver
-  roles:
-    - common
-    - docker
-
-    
