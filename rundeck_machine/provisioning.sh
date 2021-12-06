@@ -7,4 +7,4 @@ sleep 10
 
 cd ./ansible
 
-ansible-playbook -i ./hosts ./provisioning.yml.yml
+ansible-playbook -i ./hosts ./provisioning.yml
