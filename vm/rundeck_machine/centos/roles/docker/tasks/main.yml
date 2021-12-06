@@ -1,0 +1,62 @@
+---
+- name: "Update repositório centos"
+  become: true
+  shell: yum update -y
+
+- name: "Add Docker’s official GPG key"
+  become: true
+  shell:  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: "Update repositório centos"
+  become: true
+  shell: yum update -y
+
+- name: Instalando pacotes básicos para o servidor.
+  become: true
+  yum:
+    state: latest
+    name: [ "epel-release", "yum-utils", "dkms","kernel-devel" ]
+
+- name: "Install Docker Engine"
+  become: true
+  yum: 
+    name: ["docker-ce","docker-ce-cli","containerd.io"]
+    state: latest
+
+- name: "Cria o caminho para o serviço"
+  become: true
+  shell:  mkdir -p /etc/systemd/system/docker.service.d/
+
+- name: Copy override.conf
+  become: yes
+  copy:
+    src: files/override.conf
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: "Reload no daemon"
+  become: true
+  shell: systemctl daemon-reload
+
+- name: "Restart no serviço docker"
+  become: true
+  shell: systemctl restart docker.service
+
+- name: "Adiciona usuário centos ao grupo docker"
+  become: true
+  shell: usermod -aG docker centos
+
+- name: "Baixa docker-compose 1.29.2"
+  become: true
+  shell: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+- name: "Chmod"
+  become: true
+  shell: chmod +x /usr/local/bin/docker-compose
+
+- name: "Baixa docker-compose 1.29.2"
+  become: true
+  shell: ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+

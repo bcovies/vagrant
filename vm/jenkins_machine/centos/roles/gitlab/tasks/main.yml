@@ -1,0 +1,42 @@
+---   
+- name: "Instalação do curl openssh-server ca-certificates tzdata perl"
+  become: true
+  yum:
+    name: ["policycoreutils", "perl", "postfix"]
+    state: latest
+
+- name: "start firewalld"
+  become: true
+  shell: systemctl start firewalld
+
+- name: "enable firewalld"
+  become: true
+  shell: systemctl enable firewalld
+
+- name: "--add-service=http"
+  become: true
+  shell: firewall-cmd --permanent --add-service=http
+
+- name: "--add-service=https"
+  become: true
+  shell: firewall-cmd --permanent --add-service=https
+
+- name: "restart firewalld"
+  become: true
+  shell: systemctl restart firewalld
+
+- name: "enable postfix"
+  become: true
+  shell: systemctl enable postfix
+
+- name: "start postfix"
+  become: true
+  shell: systemctl start postfix
+
+- name: "Download gitlab"
+  become: true
+  shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | bash
+
+- name: "Instala gitlab"
+  become: true
+  shell: EXTERNAL_URL="http://gitlab.vm.dns.net" dnf install -y gitlab-ee

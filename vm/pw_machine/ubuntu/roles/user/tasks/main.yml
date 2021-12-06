@@ -1,0 +1,35 @@
+---
+- name: Copy id_rsa
+  become: yes
+  copy:
+    src: files/.ssh/id_rsa
+    dest: /home/ubuntu/.ssh/id_rsa
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+
+- name: Copy id_rsa.pub
+  become: yes
+  copy:
+    src: files/.ssh/id_rsa.pub
+    dest: /home/ubuntu/.ssh/id_rsa.pub
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+
+- name: Copy authorized_keys
+  become: yes
+  copy:
+    src: files/.ssh/authorized_keys
+    dest: /home/ubuntu/.ssh/authorized_keys
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+
+- name: Atualiza permissão /home/ubuntu/.ssh/
+  become: yes
+  shell: chmod 700 -R /home/ubuntu/.ssh/
+
+- name: Atualiza permissão /home/ubuntu/.ssh/
+  become: yes
+  shell: chown ubuntu:ubuntu -R /home/ubuntu/.ssh/

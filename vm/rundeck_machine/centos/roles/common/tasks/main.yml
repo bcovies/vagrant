@@ -1,0 +1,71 @@
+---
+# INSTALA O BÁSICO
+- name: "Update"
+  become: true
+  shell: yum update -y
+
+- name: "Installing all packages"
+  become: true
+  yum:
+    name: ["epel-release","yum-utils", "net-tools", "curl", "wget", "java-1.8.0-openjdk-devel"]
+    state: latest
+
+- name: "Checking Installations"
+  become: true
+  yum:
+    name: ["epel-release","yum-utils", "net-tools", "curl", "wget", "java-1.8.0-openjdk-devel" ]
+    state: present
+
+# DNS
+- name: "[WORKAROUND (CENTOS 8)]: Altera o DNS da máquina"
+  become: true
+  shell: echo "nameserver 192.168.1.200" > /etc/resolv.conf; echo "nameserver 192.168.1.254" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
+
+# USER CENTOS
+- name: Adiciona o usuário 'centos', e o inclui ao grupo 'wheel'
+  become: true
+  user:
+    name: centos
+    shell: /bin/bash
+    groups: wheel
+    append: yes
+
+- name: "Cria pasta"
+  become: true
+  shell: mkdir -p /home/centos/.ssh/
+ 
+- name: Copy id_rsa
+  become: yes
+  copy:
+    src: files/.ssh/id_rsa
+    dest: /home/centos/.ssh/id_rsa
+    owner: centos
+    group: centos
+    mode: '0600'
+
+- name: Copy id_rsa.pub
+  become: yes
+  copy:
+    src: files/.ssh/id_rsa.pub
+    dest: /home/centos/.ssh/id_rsa.pub
+    owner: centos
+    group: centos
+    mode: '0600'
+
+- name: Copy authorized_keys
+  become: yes
+  copy:
+    src: files/.ssh/authorized_keys
+    dest: /home/centos/.ssh/authorized_keys
+    owner: centos
+    group: centos
+    mode: '0600'
+
+- name: Atualiza permissão /home/centos/.ssh/
+  become: yes
+  shell: chmod 700 -R /home/centos/.ssh/
+
+- name: Atualiza permissão /home/centos/.ssh/
+  become: yes
+  shell: chown centos:centos -R /home/centos/.ssh/
+
