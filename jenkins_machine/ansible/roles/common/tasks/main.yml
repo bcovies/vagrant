@@ -19,7 +19,7 @@
 # DNS
 - name: "[WORKAROUND (CENTOS 8)]: Altera o DNS da máquina"
   become: true
-  shell: echo "nameserver 192.168.1.200" > /etc/resolv.conf; echo "nameserver 192.168.1.254" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
+  shell: echo "nameserver 192.168.2.200" > /etc/resolv.conf; echo "nameserver 192.168.2.1" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
 
 # USER CENTOS
 - name: Adiciona o usuário 'centos', e o inclui ao grupo 'wheel'
