@@ -1,4 +1,4 @@
-# vagrant_ansible_deploy
+# vagrant_machines
 
 ## Este projeto foi concebido como um ambiente de desenvolvimento para meus estudos em devops motivados pelo estágio no BNDES.
 
