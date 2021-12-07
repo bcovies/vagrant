@@ -1,0 +1,22 @@
+---
+## USER ##
+my_user: bcovies
+rundeck_user: rundeck
+sudo_user: wheel
+## PACKAGES ##
+epel_package: epel-release
+utils_package: yum-utils
+net_package: net-tools
+curl_package: curl
+wget_package: wget
+java_package: java-1.8.0-openjdk-devel
+rundeck_package: rundeck
+## PATHS ##
+user_ssh_path: /home/bcovies/.ssh
+rundeck_node_path: /etc/rundeck/nodes
+rundeck_ssh_path: /var/lib/rundeck/.ssh
+## services ##
+rundeck_service: rundeckd
+rundeck_host: http://rundeck.dns.br
+rundeck_properties_file: /etc/rundeck/rundeck-config.properties
+rundeck_script_file: https://raw.githubusercontent.com/rundeck/packaging/main/scripts/rpm-setup.sh

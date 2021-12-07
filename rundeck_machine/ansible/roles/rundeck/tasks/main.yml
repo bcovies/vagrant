@@ -1,66 +1,93 @@
 ---
-- name: "Baixa arquivos rundeck"
-  become: true
-  shell: curl https://raw.githubusercontent.com/rundeck/packaging/main/scripts/rpm-setup.sh 2> /dev/null | bash -s rundeck
+- name: "Baixa script de instalação do rundeck"
+  shell: curl "{{ rundeck_script_file }} " 2> /dev/null | bash -s rundeck
 
-- name: "Instala o rundeck"
-  become: true
-  shell: yum install rundeck -y
+- name: "Instalação do {{ rundeck_package }}"
+  dnf:
+    name:
+      - "{{ rundeck_package }}"
+    state: latest
+    update_cache: yes
 
-- name: "Update"
-  become: true
-  shell: yum update -y
+- name: "Verifica a instalação {{ rundeck_package }}"
+  dnf:
+    name:
+      - "{{ rundeck_package }}"
+    state: present
 
+# - name: Replace before the expression till the begin of the file (requires Ansible >= 2.4)
+#   replace:
+#     path: "{{ rundeck_properties_file }}"
+#     before: "# live site config"
+#     regexp: "^(.+)$"
+#     replace: '# \1'
 
 - name: "Comenta linha de filesystem no rundeck"
-  become: true
-  shell: sed -i '/projectsStorageType/s/^/#/g' /etc/rundeck/rundeck-config.properties
+  shell: sed -i '/projectsStorageType/s/^/#/g' "{{ rundeck_properties_file }}"
 
 - name: "Adiciona o hostname no arquivo"
-  become: true
-  shell: echo "rundeck.projectsStorageType=filesystem" >> /etc/rundeck/rundeck-config.properties
+  shell: echo "rundeck.projectsStorageType=filesystem" >> "{{ rundeck_properties_file }}"
 
 - name: "Comenta linha de host no rundeck"
-  become: true
-  shell: sed -i '/localhost/s/^/#/g' /etc/rundeck/rundeck-config.properties
+  shell: sed -i '/localhost/s/^/#/g' "{{ rundeck_properties_file }}"
 
 - name: "Adiciona o hostname no arquivo"
-  become: true
-  shell: echo "grails.serverURL=http://rundeck.dns.br" >> /etc/rundeck/rundeck-config.properties
+  shell: echo "grails.serverURL={{ rundeck_host }}" >> "{{ rundeck_properties_file }}"
 
-- name: "Reinicia o serviço"
-  become: true
-  shell: systemctl restart rundeckd
+- name: restart_rundeck
+  service:
+    name: "{{ rundeck_service }}"
+    state: restarted
 
-- name: "Enable no serviço"
-  become: true
-  shell: systemctl enable rundeckd
+- name: restart_rundeck
+  systemd:
+    name: "{{ rundeck_service }}"
+    enabled: yes
 
-- name: "Copia os arquivos"
-  become: true
-  shell: "cp -a /home/centos/.ssh/* /var/lib/rundeck/.ssh/"
+- name: Change file ownership, group and permissions
+  file:
+    path: "{{ rundeck_ssh_path }}"
+    remote_src: yes
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_user }}"
+    mode: "0777"
+
+- name: Copy file with owner and permissions
+  become_user: "{{ my_user }}"
+  copy:
+    src: "{{ user_ssh_path }}"
+    dest: "{{ rundeck_ssh_path }}"
+    remote_src: yes
+
+- name: Change file ownership, group and permissions
+  file:
+    path: "{{ rundeck_ssh_path }}"
+    remote_src: yes
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_user }}"
+    mode: "0754"
 
 - name: "da permissão"
-  become: true
-  shell: "chown -R rundeck:rundeck /var/lib/rundeck/.ssh/"
+  shell: "ssh-keygen -p -m PEM -f {{ rundeck_ssh_path }}/id_rsa -N '' "
 
-- name: "da permissão"
-  become: true
-  shell: ssh-keygen -p -m PEM -f /var/lib/rundeck/.ssh/id_rsa -N ''
-
-- name: "Cria o caminho"
-  become: true
-  shell: "mkdir -p /etc/rundeck/nodes/"
+- name: Creates directory
+  file:
+    path: "{{ rundeck_node_path }}"
+    remote_src: yes
+    state: directory
 
 - name: Copy id_rsa
-  become: yes
   copy:
     src: files/sourcefile.yaml
-    dest: /etc/rundeck/nodes/sourcefile.yaml
-    owner: rundeck
-    group: rundeck
-    mode: '0777'
+    dest: "{{ rundeck_node_path }}/sourcefile.yaml"
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_user }}"
+    mode: "0754"
 
-- name: "Cria o caminho"
-  become: true
-  shell: "chown -R rundeck:rundeck /etc/rundeck/nodes/"
+- name: Change file ownership, group and permissions
+  file:
+    path: "{{ rundeck_node_path }}"
+    remote_src: yes
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_user }}"
+    mode: "0754"

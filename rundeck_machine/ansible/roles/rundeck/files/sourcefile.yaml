@@ -6,8 +6,8 @@ localhost:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 docker_manager:
   nodename: docker_manager
@@ -17,8 +17,8 @@ docker_manager:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 docker_worker_1:
   nodename: docker_worker_1
@@ -28,8 +28,8 @@ docker_worker_1:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 docker_worker_2:
   nodename: docker_worker_2
@@ -39,8 +39,8 @@ docker_worker_2:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 jenkins:
   nodename: jenkins
@@ -50,8 +50,8 @@ jenkins:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 gitlab:
   nodename: gitlab
@@ -61,8 +61,8 @@ gitlab:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 proxyreverse:
   nodename: proxyreverse
@@ -72,8 +72,8 @@ proxyreverse:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
 
 vpn:
   nodename: vpn
@@ -83,5 +83,5 @@ vpn:
   osArch: amd64
   description: Rundeck server node
   osName: Linux
-  username: centos
-  tags: ''
+  username: bcovies
+  tags: ""
