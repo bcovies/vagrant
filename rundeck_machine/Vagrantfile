@@ -1,6 +1,4 @@
 Vagrant.configure("2") do |config|
- 
-    #RUNDECK
     config.vm.define "rundeck" do |rundeck|
         rundeck.vm.box = "centos/8"
         rundeck.vm.synced_folder ".", "/vagrant", disabled: true

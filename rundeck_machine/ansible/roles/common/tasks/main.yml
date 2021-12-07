@@ -1,5 +1,5 @@
 ---
-- name: "Instalação dos pacotes básicos"
+- name: "Instalação dos pacotes básicos para o Rundeck"
   dnf:
     name:
       - "{{ epel_package }}"
@@ -11,7 +11,7 @@
     state: latest
     update_cache: yes
 
-- name: "Verifica a instalação dos pacotes básicos"
+- name: "Verifica a instalação dos pacotes básicos para o Rundeck"
   dnf:
     name:
       - "{{ epel_package }}"
@@ -22,33 +22,33 @@
       - "{{ java_package }}"
     state: present
 
-# DNS
-- name: "[WORKAROUND (CENTOS 8)]: Altera o DNS da máquina"
-  shell: echo "nameserver 192.168.2.200" > /etc/resolv.conf; echo "nameserver 192.168.2.1" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
+- name: "Altera o DNS da máquina"
+  shell: echo "nameserver {{ linux_dns_server }}" > /etc/resolv.conf; echo "nameserver {{ linux_dns_gateway }}" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
 
-- name: "Adiciona o usuário '{{my_user}}', e o inclui ao grupo 'wheel'"
+- name: "Adiciona o usuário {{ my_user }}, e o inclui ao grupo {{ sudo_user }} além de gerar as chaves privadas"
   user:
-    name: "{{my_user}}"
+    name: "{{ my_user }}"
     shell: /bin/bash
-    group: wheel
+    group: "{{ sudo_user }}"
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
     append: yes
 
-- name: "Cria as chaves do usuário"
-  become_user: "{{my_user}}"
+- name: "Cópia das chaves autorizadas para login authorized_keys"
+  become_user: "{{ my_user }}"
   copy:
     src: files/authorized_keys
-    dest: /home/{{my_user}}/.ssh/authorized_keys
-    owner: "{{my_user}}"
-    group: wheel
+    dest: "{{ user_ssh_path }}/authorized_keys"
+    owner: "{{ my_user }}"
+    group: "{{ sudo_user }}"
     mode: "0600"
 
-- name: "Atualiza permissão /home/{{my_user}}/.ssh/"
-  become_user: "{{my_user}}"
-  shell: chmod 700 -R /home/"{{my_user}}"/.ssh/
-
-- name: Atualiza permissão /home/"{{my_user}}"/.ssh/
-  become_user: "{{my_user}}"
-  shell: chown "{{my_user}}":wheel -R /home/"{{my_user}}"/.ssh/
+- name: "Atualiza permissão {{ user_ssh_path }}"
+  become_user: "{{ my_user }}"
+  file:
+    path: "{{ user_ssh_path }}"
+    remote_src: yes
+    owner: "{{ my_user }}"
+    group: "{{ sudo_user }}"
+    mode: "0600"

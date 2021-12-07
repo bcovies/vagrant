@@ -15,79 +15,52 @@
       - "{{ rundeck_package }}"
     state: present
 
-# - name: Replace before the expression till the begin of the file (requires Ansible >= 2.4)
-#   replace:
-#     path: "{{ rundeck_properties_file }}"
-#     before: "# live site config"
-#     regexp: "^(.+)$"
-#     replace: '# \1'
-
-- name: "Comenta linha de filesystem no rundeck"
+- name: "Comenta linha de filesystem no arquivo {{ rundeck_properties_file }}"
   shell: sed -i '/projectsStorageType/s/^/#/g' "{{ rundeck_properties_file }}"
 
-- name: "Adiciona o hostname no arquivo"
+- name: "Adiciona filesystem no arquivo {{ rundeck_properties_file }}"
   shell: echo "rundeck.projectsStorageType=filesystem" >> "{{ rundeck_properties_file }}"
 
-- name: "Comenta linha de host no rundeck"
+- name: "Comenta linha de localhost no arquivo {{ rundeck_properties_file }}"
   shell: sed -i '/localhost/s/^/#/g' "{{ rundeck_properties_file }}"
 
-- name: "Adiciona o hostname no arquivo"
+- name: "Adiciona o {{ rundeck_host }} no arquivo {{ rundeck_properties_file }}"
   shell: echo "grails.serverURL={{ rundeck_host }}" >> "{{ rundeck_properties_file }}"
 
-- name: restart_rundeck
+- name: "Faz restart do serviço do rundeck"
   service:
     name: "{{ rundeck_service }}"
     state: restarted
 
-- name: restart_rundeck
+- name: "Habilita o serviço do rundeck para restart"
   systemd:
     name: "{{ rundeck_service }}"
     enabled: yes
 
-- name: Change file ownership, group and permissions
-  file:
-    path: "{{ rundeck_ssh_path }}"
-    remote_src: yes
-    owner: "{{ rundeck_user }}"
-    group: "{{ rundeck_user }}"
-    mode: "0777"
+- name: "Gerar arquivo {{ rundeck_ssh_path }}/id_rsa"
+  openssh_keypair:
+    path: "{{ rundeck_ssh_path }}/id_rsa"
 
-- name: Copy file with owner and permissions
-  become_user: "{{ my_user }}"
-  copy:
-    src: "{{ user_ssh_path }}"
-    dest: "{{ rundeck_ssh_path }}"
-    remote_src: yes
+- name: "Gerar arquivo {{ rundeck_ssh_path }}/id_rsa.pub"
+  openssh_keypair:
+    path: "{{ rundeck_ssh_path }}/id_rsa.pub"
 
-- name: Change file ownership, group and permissions
-  file:
-    path: "{{ rundeck_ssh_path }}"
-    remote_src: yes
-    owner: "{{ rundeck_user }}"
-    group: "{{ rundeck_user }}"
-    mode: "0754"
-
-- name: "da permissão"
+- name: "Concede permissão para a chave em Gerar arquivo {{ rundeck_ssh_path }}/id_rsa"
   shell: "ssh-keygen -p -m PEM -f {{ rundeck_ssh_path }}/id_rsa -N '' "
 
-- name: Creates directory
+- name: "Cria o diretório: {{ rundeck_node_path }}"
   file:
     path: "{{ rundeck_node_path }}"
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_user }}"
+    mode: "0750"
     remote_src: yes
     state: directory
 
-- name: Copy id_rsa
+- name: "Cópia do {{ rundeck_node_path }}/sourcefile.yaml"
   copy:
     src: files/sourcefile.yaml
     dest: "{{ rundeck_node_path }}/sourcefile.yaml"
     owner: "{{ rundeck_user }}"
     group: "{{ rundeck_user }}"
-    mode: "0754"
-
-- name: Change file ownership, group and permissions
-  file:
-    path: "{{ rundeck_node_path }}"
-    remote_src: yes
-    owner: "{{ rundeck_user }}"
-    group: "{{ rundeck_user }}"
-    mode: "0754"
+    mode: "0750"
