@@ -1,2 +1,2 @@
 [gitlab]
-gitlab.vm.dns.br     ansible_user=vagrant ansible_ssh_private_key_file="/opt/git/vagrant_machines/gitlab_machine/.vagrant/machines/gitlab/virtualbox/private_key"
+gitlab.vm.dns.br     ansible_user=vagrant ansible_ssh_private_key_file="/opt/git/vagrant/gitlab_machine/.vagrant/machines/gitlab/virtualbox/private_key"
