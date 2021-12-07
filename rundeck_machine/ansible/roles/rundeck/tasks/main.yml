@@ -45,6 +45,11 @@
   openssh_keypair:
     path: "{{ rundeck_ssh_path }}/id_rsa.pub"
 
+- name: "Cópia da chave autorizadas para login id_rsa.pub"
+  fetch:
+    src: "{{ rundeck_ssh_path }}/id_rsa.pub"
+    dest: files/id_rsa.pub
+
 - name: "Concede permissão para a chave em Gerar arquivo {{ rundeck_ssh_path }}/id_rsa"
   shell: "ssh-keygen -p -m PEM -f {{ rundeck_ssh_path }}/id_rsa -N '' "
 
