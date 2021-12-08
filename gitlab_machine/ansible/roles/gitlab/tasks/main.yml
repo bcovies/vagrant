@@ -1,42 +1,52 @@
----   
-- name: "Instalação do curl openssh-server ca-certificates tzdata perl"
-  become: true
+---
+- name: "Instalar aplicações do gitlab"
   yum:
-    name: ["policycoreutils", "perl", "postfix"]
+    name:
+      - " {{ policycoreutils_package}} "
+      - " {{ perl_package}} "
+      - " {{ postfix_package}} "
     state: latest
+    update_cache: yes
 
-- name: "start firewalld"
-  become: true
-  shell: systemctl start firewalld
+- name: "Instalar aplicações do gitlab"
+  yum:
+    name:
+      - "{{ policycoreutils_package }}"
+      - "{{ perl_package }}"
+      - "{{ postfix_package }}"
+    state: present
 
-- name: "enable firewalld"
-  become: true
-  shell: systemctl enable firewalld
+- name: "Faz start do serviço do Firewalld"
+  service:
+    name: "{{ firewall_service }}"
+    state: started
+
+- name: "Habilitar o serviço do Firewalld para restart da máquina"
+  systemd:
+    name: "{{ firewall_service }}"
+    enabled: yes
 
 - name: "--add-service=http"
-  become: true
   shell: firewall-cmd --permanent --add-service=http
 
 - name: "--add-service=https"
-  become: true
   shell: firewall-cmd --permanent --add-service=https
 
 - name: "restart firewalld"
-  become: true
-  shell: systemctl restart firewalld
+  shell: systemctl restart "{{ firewall_service }}"
 
-- name: "enable postfix"
-  become: true
-  shell: systemctl enable postfix
+- name: "Faz restart do serviço do Firewalld"
+  service:
+    name: "{{ postfix_service }}"
+    state: restarted
 
-- name: "start postfix"
-  become: true
-  shell: systemctl start postfix
+- name: "Habilitar o serviço do Firewalld para restart da máquina"
+  systemd:
+    name: "{{ postfix_service }}"
+    enabled: yes
 
 - name: "Download gitlab"
-  become: true
-  shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | bash
+  shell: curl "{{ gitlab_script }}" | bash
 
 - name: "Instala gitlab"
-  become: true
-  shell: EXTERNAL_URL="http://gitlab.vm.dns.net" dnf install -y gitlab-ee
+  shell: EXTERNAL_URL="{{ gitlab_url }}" dnf install -y "{{ gitlab_package }}"
