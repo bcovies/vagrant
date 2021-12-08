@@ -40,7 +40,7 @@
     name: "{{ postfix_service }}"
     state: restarted
 
-- name: "Habilitar o serviço do Firewalld para restart da máquina"
+- name: "Habilitar o serviço do postfix para restart da máquina"
   systemd:
     name: "{{ postfix_service }}"
     enabled: yes

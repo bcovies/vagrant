@@ -1,7 +1,6 @@
 ---
 ## USER ##
 my_user: bcovies
-rundeck_user: rundeck
 sudo_user: wheel
 ## LINUX DNS SERVER ##
 linux_dns_server: 192.168.2.200
@@ -17,11 +16,8 @@ policycoreutils_package: policycoreutils
 perl_package: perl
 postfix_package: postfix
 gitlab_package: gitlab-ee
-
 ## PATHS ##
 user_ssh_path: /home/bcovies/.ssh
-rundeck_ssh_path: /var/lib/rundeck/.ssh
-rundeck_node_path: /etc/rundeck/nodes
 ## services ##
 firewall_service: firewalld
 postfix_service: postfix
