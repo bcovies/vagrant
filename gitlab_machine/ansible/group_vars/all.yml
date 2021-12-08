@@ -18,8 +18,9 @@ postfix_package: postfix
 gitlab_package: gitlab-ee
 ## PATHS ##
 user_ssh_path: /home/bcovies/.ssh
-## services ##
+## SERVICES ##
 firewall_service: firewalld
 postfix_service: postfix
+## URLS ##
 gitlab_script: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh
 gitlab_url: http://gitlab.vm.dns.net

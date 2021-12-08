@@ -1,5 +1,5 @@
 ---
-- name: "Instalar aplicações do gitlab"
+- name: "Intalação das aplicações do GitLab"
   yum:
     name:
       - " {{ policycoreutils_package}} "
@@ -8,7 +8,7 @@
     state: latest
     update_cache: yes
 
-- name: "Verifica a instalação aplicações base do gitlab"
+- name: "Verifica a instalação aplicações base do GitLab"
   yum:
     name:
       - "{{ policycoreutils_package }}"
@@ -26,29 +26,29 @@
     name: "{{ firewall_service }}"
     enabled: yes
 
-- name: "--add-service=http"
-  shell: firewall-cmd --permanent --add-service=http
-
-- name: "--add-service=https"
-  shell: firewall-cmd --permanent --add-service=https
-
-- name: "restart firewalld"
-  service:
-    name: "{{ firewall_service }}"
-    state: restarted
-
-- name: "Faz restart do serviço do postfix"
-  service:
-    name: "{{ postfix_service }}"
-    state: restarted
-
 - name: "Habilitar o serviço do postfix para restart da máquina"
   systemd:
     name: "{{ postfix_service }}"
     enabled: yes
 
-- name: "Baixar script para instalação do gitlab"
+- name: "Adiciona os serviços http ao firewall"
+  shell: firewall-cmd --permanent --add-service=http
+
+- name: "Adiciona os serviços https ao firewall"
+  shell: firewall-cmd --permanent --add-service=https
+
+- name: "Reincia o serviço firewalld"
+  service:
+    name: "{{ firewall_service }}"
+    state: restarted
+
+- name: "Reincia o serviço postfix"
+  service:
+    name: "{{ postfix_service }}"
+    state: restarted
+
+- name: "Baixa o script para instalação do GitLab"
   shell: curl "{{ gitlab_script }}" | bash
 
-- name: "Instalar o gitlab com a url externa"
+- name: "Instala o GitLab com a url externa {{ gitlab_url }}"
   shell: EXTERNAL_URL="{{ gitlab_url }}" dnf install -y "{{ gitlab_package }}"
