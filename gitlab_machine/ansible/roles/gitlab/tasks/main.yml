@@ -8,7 +8,7 @@
     state: latest
     update_cache: yes
 
-- name: "Instalar aplicações do gitlab"
+- name: "Verifica a instalação aplicações base do gitlab"
   yum:
     name:
       - "{{ policycoreutils_package }}"
@@ -33,9 +33,11 @@
   shell: firewall-cmd --permanent --add-service=https
 
 - name: "restart firewalld"
-  shell: systemctl restart "{{ firewall_service }}"
+  service:
+    name: "{{ firewall_service }}"
+    state: restarted
 
-- name: "Faz restart do serviço do Firewalld"
+- name: "Faz restart do serviço do postfix"
   service:
     name: "{{ postfix_service }}"
     state: restarted
@@ -45,8 +47,8 @@
     name: "{{ postfix_service }}"
     enabled: yes
 
-- name: "Download gitlab"
+- name: "Baixar script para instalação do gitlab"
   shell: curl "{{ gitlab_script }}" | bash
 
-- name: "Instala gitlab"
+- name: "Instalar o gitlab com a url externa"
   shell: EXTERNAL_URL="{{ gitlab_url }}" dnf install -y "{{ gitlab_package }}"

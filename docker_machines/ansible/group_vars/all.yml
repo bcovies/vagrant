@@ -1,8 +1,9 @@
 ---
 ## USER ##
 my_user: bcovies
-rundeck_user: rundeck
-sudo_user: wheel
+docker_group: docker
+sudo_user: root
+sudo_group: wheel
 ## LINUX DNS SERVER ##
 linux_dns_server: 192.168.2.200
 linux_dns_gateway: 192.168.2.1
@@ -12,10 +13,14 @@ utils_package: yum-utils
 net_package: net-tools
 curl_package: curl
 wget_package: wget
-java_package: java-1.8.0-openjdk-devel
-rundeck_package: rundeck
+docker_ce_package: docker-ce
+docker_ce_cli_package: docker-ce-cli
+containerd_io_package: containerd.io
 ## PATHS ##
 user_ssh_path: /home/bcovies/.ssh
-rundeck_ssh_path: /var/lib/rundeck/.ssh
-rundeck_node_path: /etc/rundeck/nodes
 ## services ##
+docker_compose_path: /usr/local/bin/docker-compose
+docker_compose_url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)
+docker_repo: https://download.docker.com/linux/centos/docker-ce.repo
+docker_service: docker.service
+docker_dir_service: /etc/systemd/system/docker.service.d

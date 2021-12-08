@@ -2,7 +2,8 @@ Vagrant.configure("2") do |config|
     
     #dockermanager
     config.vm.define "manager" do |manager|
-        manager.vm.box = "ubuntu/focal64"
+        # manager.vm.box = "ubuntu/focal64"
+        manager.vm.box = "centos/8"
         manager.vm.synced_folder ".", "/vagrant", disabled: true
         manager.vbguest.no_remote = true
         manager.vbguest.auto_update = false
@@ -16,7 +17,7 @@ Vagrant.configure("2") do |config|
 
     #dockerworker01
     config.vm.define "worker01" do |worker01|
-        worker01.vm.box = "ubuntu/focal64"
+        worker01.vm.box = "centos/8"
         worker01.vm.synced_folder ".", "/vagrant", disabled: true
         worker01.vbguest.no_remote = true
         worker01.vbguest.auto_update = false
@@ -30,7 +31,7 @@ Vagrant.configure("2") do |config|
 
     #dockerworker02
     config.vm.define "worker02" do |worker02|
-        worker02.vm.box = "ubuntu/focal64"
+        worker02.vm.box = "centos/8"
         worker02.vm.synced_folder ".", "/vagrant", disabled: true
         worker02.vbguest.no_remote = true
         worker02.vbguest.auto_update = false

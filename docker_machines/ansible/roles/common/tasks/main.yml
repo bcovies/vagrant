@@ -1,0 +1,52 @@
+---
+- name: "Instalação dos pacotes básicos para o Rundeck"
+  dnf:
+    name:
+      - "{{ epel_package }}"
+      - "{{ utils_package }}"
+      - "{{ net_package }}"
+      - "{{ curl_package }}"
+      - "{{ wget_package }}"
+    state: latest
+    update_cache: yes
+
+- name: "Verifica a instalação dos pacotes básicos para o Rundeck"
+  dnf:
+    name:
+      - "{{ epel_package }}"
+      - "{{ utils_package }}"
+      - "{{ net_package }}"
+      - "{{ curl_package }}"
+      - "{{ wget_package }}"
+    state: present
+
+- name: "Altera o DNS da máquina"
+  shell: echo "nameserver {{ linux_dns_server }}" > /etc/resolv.conf; echo "nameserver {{ linux_dns_gateway }}" >> /etc/resolv.conf;  chattr +i /etc/resolv.conf;
+
+- name: "Adiciona o usuário {{ my_user }}, e o inclui ao grupo {{ sudo_user }} além de gerar as chaves privadas"
+  user:
+    name: "{{ my_user }}"
+    shell: /bin/bash
+    group: "{{ sudo_user }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    append: yes
+
+- name: "Cópia das chaves autorizadas para login authorized_keys"
+  become_user: "{{ my_user }}"
+  copy:
+    src: files/authorized_keys
+    dest: "{{ user_ssh_path }}/authorized_keys"
+    owner: "{{ my_user }}"
+    group: "{{ sudo_user }}"
+    mode: "0700"
+
+- name: "Atualiza permissão {{ user_ssh_path }}"
+  become_user: "{{ my_user }}"
+  file:
+    path: "{{ user_ssh_path }}"
+    remote_src: yes
+    owner: "{{ my_user }}"
+    group: "{{ sudo_user }}"
+    mode: "0700"
