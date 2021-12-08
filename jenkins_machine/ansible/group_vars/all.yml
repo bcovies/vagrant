@@ -1,0 +1,32 @@
+---
+## USER ##
+my_user: bcovies
+jenkins_user: jenkins
+docker_group: docker
+sudo_user: wheel
+## LINUX DNS SERVER ##
+linux_dns_server: 192.168.2.200
+linux_dns_gateway: 192.168.2.1
+## PACKAGES ##
+epel_package: epel-release
+utils_package: yum-utils
+net_package: net-tools
+curl_package: curl
+wget_package: wget
+java_package: java-1.8.0-openjdk-devel
+jenkins_package: jenkins
+docker_ce_package: docker-ce
+docker_ce_cli_package: docker-ce-cli
+conainerd_io_package: containerd.io
+## PATHS ##
+user_ssh_path: /home/bcovies/.ssh
+jenkins_ssh_path: /home/jenkins/.ssh
+## services ##
+docker_repo: https://download.docker.com/linux/centos/docker-ce.repo
+jenkins_repo_key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+jenkins_repo_dir: /etc/yum.repos.d/jenkins.repo
+jenkins_repo: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+
+jenkins_service: jenkins
+docker_service: docker
+firewall_service: firewalld

@@ -1,109 +1,88 @@
 ---
-# Instalação
-- name: "Repositório Jenkins"
-  become: true
-  shell: curl http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo > /etc/yum.repos.d/jenkins.repo
+- name: "Baixar arquivo de repositório Jenkins"
+  shell: curl "{{ jenkins_repo }}"> "{{ jenkins_repo_dir }}"
 
-- name: "Import RPM key"
-  become: true
-  shell:  rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+- name: "Importa a chave do repositório do Jenkins"
+  shell: rpm --import "{{ jenkins_repo_key }}"
 
-- name: "Repositório Jenkins"
-  become: true
-  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: "Adiciona repositório do Jenkins"
+  shell: yum-config-manager --add-repo "{{ docker_repo }}"
 
-- name: "Instala updates"
-  become: true
+- name: "Instala updates gerais"
   shell: yum update -y
 
-- name: "Instalando os pacotes para o [JENKINS]"
-  become: true
+- name: "Instalar Jenkins e Docker"
   yum:
-    name: ["jenkins", "docker-ce", "docker-ce-cli", "containerd.io"]
+    name:
+      - "{{ jenkins_package }}"
+      - "{{ docker_ce_package }}"
+      - "{{ docker_ce_cli_package }}"
+      - "{{ conainerd_io_package }}"
     state: latest
 
-- name: "Checa jenkins"
-  become: true
+- name: "Checar as instalações Jenkins e Docker"
   yum:
-    name: ["jenkins", "docker-ce", "docker-ce-cli", "containerd.io"]
+    name:
+      - "{{ jenkins_package }}"
+      - "{{ docker_ce_package }}"
+      - "{{ docker_ce_cli_package }}"
+      - "{{ conainerd_io_package }}"
     state: latest
 
-- name: "Start Jenkins"
-  become: true
-  shell: systemctl start jenkins
+- name: "Faz restart do serviço do jenkins"
+  service:
+    name: "{{ jenkins_service }}"
+    state: restarted
 
-- name: "Enable Jenkins"
-  become: true
-  shell: systemctl enable jenkins
+- name: "Habilitar o serviço do jenkins para restart da máquina"
+  systemd:
+    name: "{{ jenkins_service }}"
+    enabled: yes
 
-- name: "Start Docker"
-  become: true
-  shell: systemctl start docker
+- name: "Faz restart do serviço do docker"
+  service:
+    name: "{{ docker_service }}"
+    state: restarted
 
-- name: "Enable Docker"
-  become: true
-  shell: systemctl enable docker
+- name: "Habilitar o serviço do docker para restart da máquina"
+  systemd:
+    name: "{{ docker_service }}"
+    enabled: yes
 
-- name: "Start Firewalld"
-  become: true
-  shell: systemctl start firewalld
+- name: "Faz restart do serviço do Firewalld"
+  service:
+    name: "{{ firewall_service }}"
+    state: restarted
 
-- name: "Enable Firewalld"
-  become: true
-  shell: systemctl enable firewalld
+- name: "Habilitar o serviço do Firewalld para restart da máquina"
+  systemd:
+    name: "{{ firewall_service }}"
+    enabled: yes
 
 - name: "Port 8080 Firewalld"
-  become: true
   shell: firewall-cmd --add-port=8080/tcp --permanent
 
 - name: "Reload Firewalld"
-  become: true
-  shell:  firewall-cmd --reload
+  shell: firewall-cmd --reload
 
-- name: "Permissão docker user Jenkins"
-  become: true
-  shell:  usermod -aG docker jenkins
+- name: "Permissão docker para usuário {{ jenkins_user }}"
+  shell: usermod -aG "{{ docker_group }}" "{{ jenkins_user }}"
 
-- name: "Permissão docker user centos"
-  become: true
-  shell:  usermod -aG docker centos
+- name: "Permissão docker para usuário {{ my_user }} "
+  shell: usermod -aG "{{ docker_group }}" "{{ my_user }}"
+# - name: "Gerar arquivo {{ jenkins_ssh_path }}/id_rsa"
+#   openssh_keypair:
+#     path: "{{ jenkins_ssh_path }}/id_rsa"
 
-  # USER JENKINS
-- name: "Permissão docker user centos"
-  become: true
-  shell:  mkdir -p /home/jenkins/.ssh/
+# - name: "Gerar arquivo {{ jenkins_ssh_path }}/id_rsa.pub"
+#   openssh_keypair:
+#     path: "{{ jenkins_ssh_path }}/id_rsa.pub"
 
-- name: Copy id_rsa
-  become: yes
-  copy:
-    src: files/.ssh/id_rsa
-    dest: /home/jenkins/.ssh/id_rsa
-    owner: jenkins
-    group: jenkins
-    mode: '0600'
-
-- name: Copy id_rsa.pub
-  become: yes
-  copy:
-    src: files/.ssh/id_rsa.pub
-    dest: /home/jenkins/.ssh/id_rsa.pub
-    owner: jenkins
-    group: jenkins
-    mode: '0600'
-
-- name: Copy authorized_keys
-  become: yes
-  copy:
-    src: files/.ssh/authorized_keys
-    dest: /home/jenkins/.ssh/authorized_keys
-    owner: jenkins
-    group: jenkins
-    mode: '0600'
-
-- name: Atualiza permissão /home/jenkins/.ssh/
-  become: yes
-  shell: chmod 700 -R /home/jenkins/.ssh/
-
-- name: Atualiza permissão /home/jenkins/.ssh/
-  become: yes
-  shell: chown jenkins:jenkins -R /home/jenkins/.ssh/
+# - name: "Copiar authorized_keys para o usuário jenkins"
+#   become_user: "{{ jenkins_user }}"
+#   copy:
+#     src: files/authorized_keys
+#     dest: "{{ jenkins_ssh_path }}/authorized_keys"
+#     owner: "{{ jenkins_user }}"
+#     group: "{{ jenkins_user }}"
+#     mode: "0700"

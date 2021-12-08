@@ -1,6 +1,4 @@
 Vagrant.configure("2") do |config|
-    
-     #JENKINS
     config.vm.define "jenkins" do |jenkins|
         jenkins.vm.box = "centos/8"
         jenkins.vm.synced_folder ".", "/vagrant", disabled: true
