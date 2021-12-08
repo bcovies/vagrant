@@ -1,73 +1,66 @@
 ---
-- name: "Update repositório ubuntu"
+- name: "Adiciona configuração de repostório"
   shell: yum-config-manager --add-repo "{{ docker_repo }}"
 
-- name: "Install Docker Engine"
-  yum:
+- name: "Instalação dos pacotes necessários para o Docker"
+  dnf:
     name:
       - "{{ docker_ce_package }}"
       - "{{ docker_ce_cli_package }}"
       - "{{ containerd_io_package }}"
     state: latest
+    update_cache: yes
 
-- name: "Install Docker Engine"
-  yum:
+- name: "Confirma as instalações dos pacotes para o Docker"
+  dnf:
     name:
       - "{{ docker_ce_package }}"
       - "{{ docker_ce_cli_package }}"
       - "{{ containerd_io_package }}"
     state: present
 
-- name: "Reload no daemon"
+- name: "Reinicio do serviço Docker"
   systemd:
-    name: docker.service
-    enabled: yes
-  # shell: systemctl daemon-reload
-
-- name: "Reload no daemon"
-  systemd:
-    name: containerd.service
+    name: "{{ docker_service }}"
     enabled: yes
 
-- name: "Cria o caminho para o serviço"
-  shell: mkdir -p "{{ docker_dir_service }}"
-#   file:
-#     path: "{{ docker_dir_service }}"
-#     owner: "{{ sudo_user }}"
-#     group: "{{ sudo_group }}"
-#     mode: "0755"
+- name: "Reinicio do serviço containerd"
+  systemd:
+    name: "{{ containerd_service }}"
+    enabled: yes
 
-- name: Copy override.conf
+- name: "Cria o caminho para o serviço systemD"
+  shell: mkdir -p "{{ docker_service_path }}"
+
+- name: "Cópia de configuração de escutar na porta 0.0.0.0"
   copy:
     src: files/override.conf
-    dest: "{{ docker_dir_service }}/override.conf"
+    dest: "{{ docker_service_path }}/override.conf"
     owner: "{{ sudo_user }}"
     group: "{{ sudo_group }}"
     mode: "0755"
 
-- name: restarted
+- name: "Reincio do daemon para aplicar efeitos"
   shell: systemctl daemon-reload
 
-- name: "Restart no serviço docker"
+- name: "Reinicio do serviço Docker"
   service:
     name: "{{ docker_service }}"
     state: restarted
-  # shell: systemctl restart docker.service
 
-- name: "Restart no serviço docker"
+- name: "Reinicio do serviço Containerd"
   service:
-    name: containerd.service
+    name: "{{ containerd.service }}"
     state: restarted
-  # shell: systemctl restart docker.service
 
-- name: "Adiciona usuário ubuntu ao grupo docker"
+- name: "Concede permissão {{ docker_group }} ao usuário {{ my_user}}"
   shell: usermod -aG "{{ docker_group }}" "{{ my_user}}"
 
 - name: "Baixa docker-compose 1.29.2"
-  shell: curl -L "{{ docker_compose_url }}" -o /usr/local/bin/docker-compose
+  shell: curl -L "{{ docker_compose_url }}" -o "{{ docker_compose_path }}"
 
-- name: "Chmod"
+- name: "Concede permissão de execução ao Compose"
   shell: chmod +x "{{ docker_compose_path }}"
 
-- name: "Baixa docker-compose 1.29.2"
+- name: "Criar link para execução do Compose"
   shell: ln -s "{{ docker_compose_path }}" /usr/bin/docker-compose

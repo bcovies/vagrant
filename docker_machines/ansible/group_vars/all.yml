@@ -18,9 +18,11 @@ docker_ce_cli_package: docker-ce-cli
 containerd_io_package: containerd.io
 ## PATHS ##
 user_ssh_path: /home/bcovies/.ssh
-## services ##
 docker_compose_path: /usr/local/bin/docker-compose
+docker_service_path: /etc/systemd/system/docker.service.d
+## SERVICES ##
+docker_service: docker.service
+containerd_service: containerd.service
+## URLS ##
 docker_compose_url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)
 docker_repo: https://download.docker.com/linux/centos/docker-ce.repo
-docker_service: docker.service
-docker_dir_service: /etc/systemd/system/docker.service.d

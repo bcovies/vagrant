@@ -1,8 +1,6 @@
 Vagrant.configure("2") do |config|
-    
     #dockermanager
     config.vm.define "manager" do |manager|
-        # manager.vm.box = "ubuntu/focal64"
         manager.vm.box = "centos/8"
         manager.vm.synced_folder ".", "/vagrant", disabled: true
         manager.vbguest.no_remote = true
