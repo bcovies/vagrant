@@ -8,9 +8,6 @@
 - name: "Adiciona repositório do Jenkins"
   shell: yum-config-manager --add-repo "{{ docker_repo }}"
 
-- name: "Instala updates gerais"
-  shell: yum update -y
-
 - name: "Instalar Jenkins e Docker"
   yum:
     name:
@@ -19,6 +16,7 @@
       - "{{ docker_ce_cli_package }}"
       - "{{ conainerd_io_package }}"
     state: latest
+    update_cache: yes
 
 - name: "Checar as instalações Jenkins e Docker"
   yum:
