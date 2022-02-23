@@ -1,0 +1,10 @@
+[template]
+src = "Vagrantfile.tmpl"
+dest = "/tmp/confd/vagrant/rundeck/Vagrantfile"
+keys = [
+    "/name/machine/1",
+    "/cpu/machine/1",
+    "/ram/machine/1",
+    "/ip/machine/1",
+    "/network/adapter",
+]

@@ -1,0 +1,10 @@
+[template]
+src = "Vagrantfile.tmpl"
+dest = "/tmp/confd/vagrant/dockermgr/Vagrantfile"
+keys = [
+    "/name/machine/3",
+    "/cpu/machine/3",
+    "/ram/machine/3",
+    "/ip/machine/3",
+    "/network/adapter",
+]

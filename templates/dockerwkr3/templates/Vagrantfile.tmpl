@@ -1,0 +1,12 @@
+Vagrant.configure("2") do |config|
+    config.vm.define "{{ getv "/name/machine/6" }}" do |{{ getv "/name/machine/6" }}|
+        {{ getv "/name/machine/6" }}.vm.box = "ubuntu/focal64"
+        {{ getv "/name/machine/6" }}.vm.synced_folder ".", "/vagrant", disabled: true
+        {{ getv "/name/machine/6" }}.vm.network "public_network", ip: "{{ getv "/ip/machine/6" }}", bridge: "{{ getv "/network/adapter" }}"
+        {{ getv "/name/machine/6" }}.vm.provider "virtualbox" do |v|
+            v.memory= {{ getv "/ram/machine/6" }}
+            v.cpus = {{ getv "/cpu/machine/6" }}
+            v.name = "{{ getv "/name/machine/6" }}"
+        end  
+    end   
+end
