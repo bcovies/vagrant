@@ -1,0 +1,43 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      apt: update_cache=true cache_valid_time=3600
+
+  handlers:
+    - name: Enable jenkins service
+      shell: systemctl enable jenkins
+
+    - name: Restart jenkins service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: jenkins
+
+  tasks:
+    - name: Install Java
+      apt: name=openjdk-11-jdk state=present
+
+    - name: Add jenkins apt-key
+      apt_key:
+        url: "{{ jenkins_apt_key }}"
+        state: present
+      
+    - name:  Add jenkins repository 1
+      apt_repository:
+        repo: deb "{{ jenkins_repo_url }}" binary/
+        state: present
+
+    - name: Update apt
+      apt: update_cache=true cache_valid_time=3600
+
+    - name: Install jenkins
+      apt: name=jenkins state=present
+      notify:
+        - Enable jenkins service
+        - Restart jenkins service
