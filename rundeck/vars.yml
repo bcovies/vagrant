@@ -1,0 +1,4 @@
+---
+rundeck_apt_key: https://packages.rundeck.com/pagerduty/rundeck/gpgkey
+rundeck_repo_url: https://packages.rundeck.com/pagerduty/rundeck/any/
+rundeck_node_path: /etc/rundeck/nodes

@@ -7,6 +7,9 @@ Vagrant.configure("2") do |config|
             v.memory= {{ getv "/ram/machine/1" }}
             v.cpus = {{ getv "/cpu/machine/1" }}
             v.name = "{{ getv "/name/machine/1" }}"
-        end  
+        end
+        {{ getv "/name/machine/1" }}.vm.provision "ansible" do |ansible|
+            ansible.playbook = "playbook.yml"
+        end
     end   
 end

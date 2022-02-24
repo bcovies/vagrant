@@ -1,0 +1,73 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      apt: update_cache=true cache_valid_time=3600
+
+  handlers:
+    - name: Enable rundeckd service
+      shell: systemctl enable rundeckd
+
+    - name: Restart rundeckd service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: rundeckd
+
+  tasks:
+    - name: Install Java
+      apt: name=openjdk-11-jdk state=present
+
+    - name: Add Rundeck apt-key
+      apt_key:
+        url: "{{ rundeck_apt_key }}"
+        state: present
+      
+    - name:  Add Rundeck repository 1
+      apt_repository:
+        repo: deb "{{ rundeck_repo_url }}" any main
+        state: present
+
+    - name:  Add Rundeck repository 2
+      apt_repository:
+        repo: deb-src "{{ rundeck_repo_url }}" any main
+        state: present
+
+    - name: Update apt
+      apt: update_cache=true cache_valid_time=3600
+
+    - name: Install rundeck
+      apt: name=rundeck state=present
+
+    - name: Copy properties file
+      copy:
+        src: files/rundeck-config.properties
+        dest: /etc/rundeck/rundeck-config.properties
+      notify: 
+        - Enable rundeckd service
+        - Restart rundeckd service
+
+    - name: "Create dir: {{ rundeck_node_path }}"
+      file:
+        path: "{{ rundeck_node_path }}"
+        owner: rundeck
+        group: rundeck
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+    - name: "Copy {{ rundeck_node_path }}/sourcefile.yaml"
+      copy:
+        src: files/sourcefile.yaml
+        dest: "{{ rundeck_node_path }}/sourcefile.yaml"
+        owner: rundeck
+        group: rundeck
+        mode: "0750"
+      notify:
+        - Enable rundeckd service
+        - Restart rundeckd service

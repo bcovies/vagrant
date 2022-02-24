@@ -14,13 +14,13 @@ create_templates_path_tmp(){
     echo "----------------------------------------------------------------------------"
     echo "Creating all /tmp/ folders to confd templates..."
     for local_folder_name in ${PROJECTS_TEMPLATES[@]}; do
-        mkdir -p ${PATH_TMP_FILES}/${local_folder_name}
-        if [[ -d ${PATH_TMP_FILES}/${local_folder_name} ]]; then
+        mkdir -p ${PATH_TMP_FILES}/${local_folder_name}/files
+        if [[ -d ${PATH_TMP_FILES}/${local_folder_name}/files ]]; then
             echo "----------------------------------------------------------------------------"
-            echo "OK ${PATH_TMP_FILES}/${local_folder_name}"
+            echo "OK ${PATH_TMP_FILES}/${local_folder_name}/files"
         else
             echo "----------------------------------------------------------------------------"
-            echo "ERROR: cloud not create ${PATH_TMP_FILES}/${local_folder_name}"
+            echo "ERROR: cloud not create ${PATH_TMP_FILES}/${local_folder_name}/files"
             exit 1
         fi
     done

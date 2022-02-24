@@ -1,3 +1,4 @@
 .vagrant/
 .ssh/
 Vagrantfile
+files/
