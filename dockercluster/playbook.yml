@@ -1,0 +1,76 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      apt: 
+        update_cache: true 
+        cache_valid_time: 3600
+
+    - name: Install needed files
+      apt: 
+        update_cache: true 
+        name: 
+         - ca-certificates
+         - curl
+         - gnupg 
+         - lsb-release
+
+  handlers:
+    - name: Enable docker service
+      shell: systemctl enable docker
+
+    - name: Restart docker service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: docker
+
+  tasks:
+    - name: Add docker apt-key
+      apt_key:
+        url: "{{ docker_apt_key }}"
+        state: present
+      
+    - name:  Add docker repository 1
+      apt_repository:
+        repo: deb "{{ docker_repo_url }}" focal stable
+        state: present
+
+    - name: Update apt cache if needed
+      apt: 
+        update_cache: true 
+        cache_valid_time: 3600
+
+    - name: Install docker
+      apt: 
+        name: 
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io
+        state: present
+      notify:
+        - Enable docker service
+        - Restart docker service
+
+    - name: "Create dir: /etc/systemd/system/docker.service.d"
+      file:
+        path: /etc/systemd/system/docker.service.d
+        owner: root
+        group: root
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+
+    - name: Copy override file
+      copy:
+        src: files/override.conf
+        dest: /etc/systemd/system/docker.service.d/override.conf
+      notify: 
+        - Enable docker service
+        - Restart docker service

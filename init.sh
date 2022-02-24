@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECTS_TEMPLATES=( "rundeck" "jenkins" "dockermgr" "dockerwkr1" )
+PROJECTS_TEMPLATES=( "rundeck" "jenkins" "dockercluster" )
 CONFD_BIN_FILE=confd-0.16.0-linux-amd64
 PATH_TMP_FILES=/tmp/confd/vagrant
 
