@@ -66,6 +66,8 @@
         remote_src: yes
         state: directory
 
+    - name: Give vagrant docker permissions
+      shell: usermod -aG docker vagrant
 
     - name: Copy override file
       copy:
@@ -82,6 +84,6 @@
         owner: vagrant
         group: vagrant
         mode: "0700"
-            
+
     - name: append Authorized_keys
       shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys
