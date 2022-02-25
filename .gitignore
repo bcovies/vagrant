@@ -2,3 +2,4 @@
 .ssh/
 Vagrantfile
 files/
+ssh_keys/

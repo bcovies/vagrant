@@ -74,3 +74,11 @@
       notify: 
         - Enable docker service
         - Restart docker service
+
+    - name: Copy ssh files
+      copy:
+        src: ../ssh_keys/
+        dest: /home/vagrant/.ssh
+    
+    - name: append Authorized_keys
+      shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys

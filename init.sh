@@ -64,6 +64,11 @@ copy_files_tmp_folder(){
     done
 }
 
+generate_ssh_keys(){
+    mkdir ${CURRENT_PATH}/ssh_keys/
+    ssh-keygen -f ${CURRENT_PATH}/ssh_keys/admin -N ""
+}
+
 
 init(){
     create_templates_path_tmp
@@ -71,6 +76,7 @@ init(){
     create_templates_confd
     create_local_foldes
     copy_files_tmp_folder
+    generate_ssh_keys
 }
 
 init
