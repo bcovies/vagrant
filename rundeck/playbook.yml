@@ -44,7 +44,15 @@
     - name: Install rundeck
       apt: name=rundeck state=present
 
-    - name: Copy properties file
+    - name: Copy framework file
+      copy:
+        src: files/framework.properties
+        dest: /etc/rundeck/framework.properties
+      notify: 
+        - Enable rundeckd service
+        - Restart rundeckd service
+
+    - name: Copy config file
       copy:
         src: files/rundeck-config.properties
         dest: /etc/rundeck/rundeck-config.properties
@@ -76,6 +84,17 @@
       copy:
         src: ../ssh_keys/
         dest: /home/vagrant/.ssh
-    
+        owner: vagrant
+        group: vagrant
+        mode: "0700"
+
     - name: append Authorized_keys
       shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys
+    
+    - name: Copy ssh files
+      copy:
+        src: ../ssh_keys/
+        dest: /var/lib/rundeck/.ssh/
+        owner: rundeck
+        group: rundeck
+        mode: "0700"

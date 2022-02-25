@@ -46,6 +46,20 @@
       copy:
         src: ../ssh_keys/
         dest: /home/vagrant/.ssh
-    
+        owner: vagrant
+        group: vagrant
+        mode: "0700"
+
     - name: append Authorized_keys
       shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys
+
+    - name: Copy ssh files
+      copy:
+        src: ../ssh_keys/
+        dest: /home/jenkins/.ssh
+        owner: jenkins
+        group: jenkins
+        mode: "0700"
+
+    - name: append Authorized_keys
+      shell: cat /home/jenkins/.ssh/admin.pub >> /home/jenkins/.ssh/authorized_keys

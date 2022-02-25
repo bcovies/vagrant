@@ -3,5 +3,7 @@ src = "sourcefile.tmpl"
 dest = "/tmp/confd/vagrant/rundeck/files/sourcefile.yaml"
 keys = [
     "/name/machine/2",
+    "/name/machine/3",
+    "/name/machine/4",
     "/domain/sufix",
 ]
