@@ -15,6 +15,7 @@
       apt: 
         update_cache: true 
         name: 
+         - apt-transport-https
          - ca-certificates
          - curl
          - gnupg 
@@ -40,6 +41,16 @@
     - name:  Add docker repository 1
       apt_repository:
         repo: deb "{{ docker_repo_url }}" focal stable
+        state: present
+
+    - name: Add kubernetes apt-key
+      apt_key:
+        url: "{{ k8s_apt_key }}"
+        state: present
+      
+    - name:  Add kubernetes repository 1
+      apt_repository:
+        repo: deb "{{ k8s_repo_url }}" kubernetes-xenial main
         state: present
 
     - name: Update apt cache if needed
@@ -83,6 +94,14 @@
       notify: 
         - Enable docker service
         - Restart docker service
+
+    - name: Install kubernetes
+      apt: 
+        name: 
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
 
     - name: Copy ssh files
       copy:
