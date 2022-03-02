@@ -32,6 +32,15 @@
         daemon_reload: yes
         name: docker
 
+    - name: Enable kubelet service
+      shell: systemctl enable kubelet
+
+    - name: Restart kubelet service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: kubelet
+
   tasks:
     - name: Add docker apt-key
       apt_key:
@@ -102,6 +111,9 @@
           - kubeadm
           - kubectl
         state: present
+      notify:
+        - Enable kubelet service
+        - Restart kubelet service
 
     - name: Copy ssh files
       copy:

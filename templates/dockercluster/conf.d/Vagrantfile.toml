@@ -10,5 +10,9 @@ keys = [
     "/cpu/machine/4",
     "/ram/machine/4",
     "/ip/machine/4",
+    "/name/machine/5",
+    "/cpu/machine/5",
+    "/ram/machine/5",
+    "/ip/machine/5",
     "/network/adapter",
 ]
