@@ -42,9 +42,10 @@
       shell: systemctl restart kubelet
 
     - name: restart_system
-      shell: systemctl reboot
+      reboot:
+      
   tasks:
-
+  
   ###------     CONFIGS
     - name: Copy ssh files
       copy:
@@ -164,4 +165,15 @@
       notify:
         - enable_kubelet
         - restart_kubelet
+  ###----- OTHERS
+    - name: Remove /etc/resolv.conf
+      shell: rm -f /etc/resolv.conf
+
+    - name: Update /etc/resolv.conf
+      shell: tee /etc/resolv.conf <<EOF
+        nameserver 192.168.2.50
+        nameserver 192.168.2.1
+        EOF
+      notify:
         - restart_system
+  
