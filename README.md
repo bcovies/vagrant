@@ -108,3 +108,7 @@ vagrant_ansible_deploy/ansible/centos/roles/rundeck/tasks/main.yml
 ```
 
 
+sudo kubeadm init --apiserver-advertise-address 192.168.2.4 \
+    --pod-network-cidr=10.0.0.0/16 \
+    --upload-certs \
+    --control-plane-endpoint=dockermgr.vm.dev.local
