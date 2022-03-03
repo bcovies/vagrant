@@ -18,103 +18,34 @@
          - apt-transport-https
          - ca-certificates
          - curl
+         - vim
+         - git
          - gnupg 
          - lsb-release
          - openjdk-11-jdk
 
   handlers:
-    - name: Enable docker service
+
+    - name: reload_daemon
+      shell: systemctl daemon-reload 
+
+    - name: enable_docker
       shell: systemctl enable docker
 
-    - name: Restart docker service
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        name: docker
+    - name: restart_docker
+      shell: systemctl restart docker
 
-    - name: Enable kubelet service
+    - name: enable_kubelet
       shell: systemctl enable kubelet
 
-    - name: Restart kubelet service
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        name: kubelet
+    - name: restart_kubelet
+      shell: systemctl restart kubelet
 
+    - name: restart_system
+      shell: systemctl reboot
   tasks:
-    - name: Add docker apt-key
-      apt_key:
-        url: "{{ docker_apt_key }}"
-        state: present
-      
-    - name:  Add docker repository 1
-      apt_repository:
-        repo: deb "{{ docker_repo_url }}" focal stable
-        state: present
 
-    - name: Add kubernetes apt-key
-      apt_key:
-        url: "{{ k8s_apt_key }}"
-        state: present
-      
-    - name:  Add kubernetes repository 1
-      apt_repository:
-        repo: deb "{{ k8s_repo_url }}" kubernetes-xenial main
-        state: present
-
-    - name: Update apt cache if needed
-      apt: 
-        update_cache: true 
-        cache_valid_time: 3600
-
-    - name: Install docker
-      apt: 
-        name: 
-          - docker-ce 
-          - docker-ce-cli 
-          - containerd.io
-        state: present
-      notify:
-        - Enable docker service
-        - Restart docker service
-
-    - name: "Create dir: /etc/systemd/system/docker.service.d"
-      file:
-        path: /etc/systemd/system/docker.service.d
-        owner: root
-        group: root
-        mode: "0750"
-        remote_src: yes
-        state: directory
-
-    - name: Give vagrant docker permissions
-      shell: usermod -aG docker vagrant
-
-    - name: Install docker-compose from official github repo
-      get_url:
-        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: 'u+x,g+x'
-
-    - name: Copy override file
-      copy:
-        src: files/override.conf
-        dest: /etc/systemd/system/docker.service.d/override.conf
-      notify: 
-        - Enable docker service
-        - Restart docker service
-
-    - name: Install kubernetes
-      apt: 
-        name: 
-          - kubelet
-          - kubeadm
-          - kubectl
-        state: present
-      notify:
-        - Enable kubelet service
-        - Restart kubelet service
-
+  ###------     CONFIGS
     - name: Copy ssh files
       copy:
         src: ../ssh_keys/
@@ -123,5 +54,114 @@
         group: vagrant
         mode: "0700"
 
-    - name: append Authorized_keys
+    - name: Add admin keys to authorized_keys
       shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys
+  
+    - name: Add docker to apt-key
+      apt_key:
+        url: "{{ docker_apt_key }}"
+        state: present
+      
+    - name:  Add docker repository to apt_repository
+      apt_repository:
+        repo: deb "{{ docker_repo_url }}" focal stable
+        state: present
+
+    - name: Add k8s to apt-key
+      apt_key:
+        url: "{{ k8s_apt_key }}"
+        state: present
+      
+    - name:  Add k8s to apt_repository 
+      apt_repository:
+        repo: deb "{{ k8s_repo_url }}" kubernetes-xenial main
+        state: present
+
+    - name: Update apt with new repositories
+      apt: 
+        update_cache: true 
+        cache_valid_time: 3600
+
+  ###------     DOCKER
+    - name: Install docker-ce, docker-ce-cli && containerd.io
+      apt: 
+        name: 
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io
+        state: present
+
+    - name: "Creates dir at /etc/systemd/system/docker.service.d"
+      file:
+        path: /etc/systemd/system/docker.service.d
+        owner: root
+        group: root
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+    - name:  Create daemon json config file
+      shell: | 
+        tee /etc/docker/daemon.json <<EOF
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"],
+          "log-driver": "json-file",
+          "log-opts": {
+            "max-size": "100m"
+          },
+          "storage-driver": "overlay2"
+        }
+        EOF
+
+    - name: Copy override file (exposes to 0.0.0.0)
+      copy:
+        src: files/override.conf
+        dest: /etc/systemd/system/docker.service.d/override.conf
+      notify: 
+        - enable_docker
+        - restart_docker
+        - reload_daemon
+
+    - name: Gives vagrant user docker permissions
+      shell: usermod -aG docker vagrant
+
+    - name: Install docker-compose from official github repo
+      get_url:
+        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'
+
+  ###------     K8S
+    - name: Install kubelet, kubeadm && kubectl
+      apt: 
+        name: 
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+
+    - name: Apt-mark k8s
+      shell: apt-mark hold kubelet kubeadm kubectl   
+
+    - name: disable swap
+      shell: swapoff -a
+
+    - name: Enable kernel modules
+      shell: |
+        modprobe overlay
+        modprobe br_netfilter
+
+    - name: Add some settings to sysctl
+      shell: |
+        tee /etc/sysctl.d/kubernetes.conf<<EOF
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        net.ipv4.ip_forward = 1
+        EOF
+
+    - name: Reload sysctl
+      shell: sysctl --system
+      notify:
+        - enable_kubelet
+        - restart_kubelet
+        - restart_system
