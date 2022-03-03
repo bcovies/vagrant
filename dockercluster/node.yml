@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Download kubeadm config images
+      shell: sudo kubeadm config images pull
+
+  # tasks:

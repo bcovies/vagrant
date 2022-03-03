@@ -1,0 +1,46 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Download kubeadm config images
+      shell: sudo kubeadm config images pull
+
+  tasks:
+    - name: Kubeinit
+      shell: |
+        kubeadm init \
+          --apiserver-advertise-address={{ k8smaster_ip }} \
+          --apiserver-cert-extra-sans={{ k8smaster_ip }} \
+          --pod-network-cidr=10.10.0.0/16 \
+          --node-name {{ k8smaster_hostname }} \
+          --ignore-preflight-errors Swap
+
+    - name: "Creates dir at /home/vagrant/.kube"
+      file:
+        path: /home/vagrant/.kube
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+    - name: Copy override file (exposes to 0.0.0.0)
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        remote_src: yes
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+
+    - name: Kube apply Calico
+      sudo_user: vagrant
+      shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
+    - name: Allow master node to execute pods
+      sudo_user: vagrant
+      shell: kubectl label node {{ k8smaster_hostname }} node-role.kubernetes.io/worker=worker-new

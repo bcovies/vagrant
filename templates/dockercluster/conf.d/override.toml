@@ -1,4 +1,0 @@
-[template]
-src = "override.tmpl"
-dest = "/tmp/confd/vagrant/dockercluster/files/override.conf"
-keys = []

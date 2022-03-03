@@ -172,8 +172,11 @@
 
     - name: Copy override file (exposes to 0.0.0.0)
       copy:
-        src: files/override.conf
         dest: /etc/systemd/system/docker.service.d/override.conf
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
       notify: 
         - enable_docker
         - restart_docker
@@ -206,9 +209,6 @@
       notify:
         - enable_kubelet
         - restart_kubelet
-        
-    - name: Download kube images
-      shell: kubeadm config images pull
 
   ###----- OTHERS
     - name: Remove /etc/resolv.conf
