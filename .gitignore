@@ -3,4 +3,4 @@
 Vagrantfile
 files/
 ssh_keys/
-playbook.retry
+*.retry
