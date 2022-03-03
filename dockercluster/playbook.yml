@@ -42,8 +42,8 @@
       shell: systemctl restart kubelet
 
     - name: restart_system
-      reboot:
-      
+      shell: reboot
+
   tasks:
   
   ###------     CONFIGS
@@ -102,17 +102,17 @@
         state: directory
 
     - name:  Create daemon json config file
-      shell: | 
-        tee /etc/docker/daemon.json <<EOF
-        {
-          "exec-opts": ["native.cgroupdriver=systemd"],
-          "log-driver": "json-file",
-          "log-opts": {
-            "max-size": "100m"
-          },
-          "storage-driver": "overlay2"
-        }
-        EOF
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+            {
+              "exec-opts": ["native.cgroupdriver=systemd"],
+              "log-driver": "json-file",
+              "log-opts": {
+                "max-size": "100m"
+              },
+              "storage-driver": "overlay2"
+            }
 
     - name: Copy override file (exposes to 0.0.0.0)
       copy:
@@ -153,27 +153,29 @@
         modprobe br_netfilter
 
     - name: Add some settings to sysctl
-      shell: |
-        tee /etc/sysctl.d/kubernetes.conf<<EOF
-        net.bridge.bridge-nf-call-ip6tables = 1
-        net.bridge.bridge-nf-call-iptables = 1
-        net.ipv4.ip_forward = 1
-        EOF
+      copy:
+        dest: /etc/sysctl.d/kubernetes.conf
+        content: |
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
 
     - name: Reload sysctl
       shell: sysctl --system
       notify:
         - enable_kubelet
         - restart_kubelet
+
   ###----- OTHERS
     - name: Remove /etc/resolv.conf
       shell: rm -f /etc/resolv.conf
 
     - name: Update /etc/resolv.conf
-      shell: tee /etc/resolv.conf <<EOF
-        nameserver 192.168.2.50
-        nameserver 192.168.2.1
-        EOF
+      copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 192.168.2.50
+          nameserver 192.168.2.1
       notify:
         - restart_system
   
