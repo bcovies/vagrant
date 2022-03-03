@@ -3,4 +3,5 @@ docker_apt_key: https://download.docker.com/linux/ubuntu/gpg
 docker_repo_url: https://download.docker.com/linux/ubuntu
 k8s_apt_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
 k8s_repo_url: https://apt.kubernetes.io
+k8s_apt_version: 1.23.3-00
 ansible_python_interpreter: /usr/bin/python3

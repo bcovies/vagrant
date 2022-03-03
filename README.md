@@ -107,33 +107,15 @@ vagrant_ansible_deploy/ansible/centos/roles/rundeck/tasks/main.yml
 
 ```
 
-https://computingforgeeks.com/deploy-kubernetes-cluster-on-ubuntu-with-kubeadm/
-
-
-
-sudo kubeadm init --service-cidr {{ service_cidr }} \
-                 --kubernetes-version {{ kube_version }} \
-                 --pod-network-cidr {{ pod_network_cidr }} \
-
-
-sudo kubeadm init --apiserver-advertise-address 192.168.2.4 \
-    --control-plane-endpoint=dockermgr.vm.dev.local \
-    --upload-certs \
-    --node-name dockermgr.vm.dev.local \
-    --service-dns-domain dev.local \
-    --pod-network-cidr=10.244.0.0/16 \
-    --service-cidr 10.96.0.0/12 
+https://github.com/scriptcamp/vagrant-kubeadm-kubernetes
 
 kubectl get pods -n kube-system
 kubectl get nodes
 kubectl cluster-info
 sudo ip link delete flannel.1
 
-https://www.mirantis.com/blog/how-install-kubernetes-kubeadm/
-
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-
-https://github.com/kairen/kubeadm-ansible
+sudo kubeadm init --apiserver-advertise-address=192.168.2.4 \
+  --apiserver-cert-extra-sans=192.168.2.4 \
+  --pod-network-cidr=10.10.0.0/16 \
+  --node-name k8smaster.vm.dev.local \
+  --ignore-preflight-errors Swap
