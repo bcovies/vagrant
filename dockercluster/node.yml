@@ -5,8 +5,43 @@
   vars_files:
     - vars.yml
 
-  pre_tasks:
-    - name: Download kubeadm config images
-      shell: sudo kubeadm config images pull
+  tasks:
+    - name: Pulling from master init script
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/join.sh /home/vagrant/
 
-  # tasks:
+    - name: Changing permissions
+      file:
+        path: /home/vagrant/join.sh
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+
+    - name: execute script
+      shell: /home/vagrant/join.sh
+
+    - name: "Creates dir at /home/vagrant/.kube"
+      file:
+        path: /home/vagrant/.kube
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+    - name: Pulling from master K8s configs
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/.kube/config /home/vagrant/.kube/
+
+    - name: Changing permissions
+      file:
+        path: /home/vagrant/.kube/config
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+     
+    - name: Label node to execute pods
+      sudo_user: vagrant
+      shell: kubectl label node {{ k8snode1_hostname }} node-role.kubernetes.io/worker=worker-new

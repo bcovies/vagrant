@@ -44,3 +44,11 @@
     - name: Allow master node to execute pods
       sudo_user: vagrant
       shell: kubectl label node {{ k8smaster_hostname }} node-role.kubernetes.io/worker=worker-new
+
+    - name: Creates join scripts
+      sudo_user: vagrant
+      shell: echo "#!/bin/bash" > ~/join.sh
+
+    - name: Append join script
+      sudo_user: vagrant
+      shell: kubeadm token create --print-join-command >> ~/join.sh
