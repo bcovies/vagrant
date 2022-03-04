@@ -52,7 +52,7 @@
         remote_src: yes
 
     - name: execute script
-      shell: "{{ vagrant_home_path }}/join.sh"
+      shell: "{{ vagrant_home_path }}/join_k8s.sh"
 
     - name: "Creates dir at {{ vagrant_home_path }}/.kube"
       file:
