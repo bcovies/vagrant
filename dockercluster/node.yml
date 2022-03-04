@@ -21,41 +21,42 @@
         sleep: 5
         delay: 5
         timeout: 300
+        
   ###----- SWARM JOIN
     - name: Pulling from master swarm join script
       sudo_user: vagrant
-      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/swarm.sh /home/vagrant/
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/join_swarm.sh {{ vagrant_home_path }}/
 
     - name: Changing permissions
       file:
-        path: /home/vagrant/swarm.sh
+        path: "{{ vagrant_home_path }}/join_swarm.sh"
         owner: vagrant
         group: vagrant
         mode: "0750"
         remote_src: yes
 
     - name: execute script
-      shell: /home/vagrant/swarm.sh
+      shell: "{{ vagrant_home_path }}/join_swarm.sh"
 
   ###----- K8S JOIN
     - name: Pulling from master init script
       sudo_user: vagrant
-      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/join.sh /home/vagrant/
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/join_k8s.sh {{ vagrant_home_path }}/
 
     - name: Changing permissions
       file:
-        path: /home/vagrant/join.sh
+        path: "{{ vagrant_home_path }}/join_k8s.sh"
         owner: vagrant
         group: vagrant
         mode: "0750"
         remote_src: yes
 
     - name: execute script
-      shell: /home/vagrant/join.sh
+      shell: "{{ vagrant_home_path }}/join.sh"
 
-    - name: "Creates dir at /home/vagrant/.kube"
+    - name: "Creates dir at {{ vagrant_home_path }}/.kube"
       file:
-        path: /home/vagrant/.kube
+        path: "{{ vagrant_home_path }}/.kube"
         owner: vagrant
         group: vagrant
         mode: "0750"
@@ -64,11 +65,11 @@
 
     - name: Pulling from master K8s configs
       sudo_user: vagrant
-      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/.kube/config /home/vagrant/.kube/
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/.kube/config {{ vagrant_home_path }}/.kube/
 
     - name: Changing permissions
       file:
-        path: /home/vagrant/.kube/config
+        path: "{{ vagrant_home_path }}/.kube/config"
         owner: vagrant
         group: vagrant
         mode: "0750"

@@ -28,28 +28,26 @@
 
   ###---- Swarm
     - name: Docker Swarm init
-      shell: docker swarm init --advertise-addr 192.168.2.4
+      shell: docker swarm init --advertise-addr {{ k8smaster_ip }}
     
-    - name: Creates join script swarm.sh
+    - name: Creates join script join_swarm.sh
       copy:
-        dest: /home/vagrant/swarm.sh
+        dest: "{{ vagrant_home_path }}/join_swarm.sh" 
         content: |
           #!/bin/bash
           docker swarm join \
             --token change_your_token_here \
-            192.168.2.4:2377
+            {{ k8smaster_ip }}:2377
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
 
     - name: Load vars
       shell: docker swarm join-token --quiet worker
-      register: ps
-      # Print the shell task's stdout.
-    - debug: msg={{ ps.stdout }}
-
-    # Print all contents of the shell task's output.
-    - debug: var=ps
+      register: join_token
 
     - name: replace script swarm.sh
-      shell: sed -i "s/\bchange_your_token_here\b/{{ ps.stdout }} /g" swarm.sh 
+      shell: sed -i "s/\bchange_your_token_here\b/{{ join_token.stdout }} /g" join_swarm.sh 
 
   ###---- K8s
     - name: Kubeinit
@@ -61,19 +59,19 @@
           --node-name {{ k8smaster_hostname }} \
           --ignore-preflight-errors Swap
 
-    - name: "Creates dir at /home/vagrant/.kube"
+    - name: "Creates dir at {{ vagrant_home_path }}/.kube"
       file:
-        path: /home/vagrant/.kube
+        path: "{{ vagrant_home_path }}/.kube"
         owner: vagrant
         group: vagrant
         mode: "0750"
         remote_src: yes
         state: directory
 
-    - name: Copy override file (exposes to 0.0.0.0)
+    - name: Copy from /etc/kubernetes/admin.conf to "{{ vagrant_home_path }}/.kube/config"
       copy:
         src: /etc/kubernetes/admin.conf
-        dest: /home/vagrant/.kube/config
+        dest: "{{ vagrant_home_path }}/.kube/config"
         remote_src: yes
         owner: vagrant
         group: vagrant
@@ -87,10 +85,10 @@
       sudo_user: vagrant
       shell: kubectl label node {{ k8smaster_hostname }} node-role.kubernetes.io/worker=worker-new
 
-    - name: Creates join scripts
+    - name: Creates k8s join script
       sudo_user: vagrant
-      shell: echo "#!/bin/bash" > ~/join.sh
+      shell: echo "#!/bin/bash" > {{ vagrant_home_path }}/join_k8s.sh
 
-    - name: Append join script
+    - name: Append k8s join script with token
       sudo_user: vagrant
-      shell: kubeadm token create --print-join-command >> ~/join.sh
+      shell: kubeadm token create --print-join-command >> {{ vagrant_home_path }}/join_k8s.sh
