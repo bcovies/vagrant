@@ -33,6 +33,12 @@
         group: vagrant
         mode: "0700"
 
+    - name: Creates IdentityFile
+      copy:
+        dest: "{{ k8s_system_etc_path }}/k8s.conf"
+        content: |
+          IdentityFile {{ vagrant_home_path }}/.ssh/admin
+          
     - name: disable swap
       shell: swapoff -a
     
