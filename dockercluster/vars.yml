@@ -1,6 +1,11 @@
 ---
 docker_apt_key: https://download.docker.com/linux/ubuntu/gpg 
 docker_repo_url: https://download.docker.com/linux/ubuntu
+docker_apt_version: 20.10.12
+dockercompose_apt_version: 1.29.2
+
+containerdio_apt_version: 1.4.13
+
 k8s_apt_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
 k8s_repo_url: https://apt.kubernetes.io
 
