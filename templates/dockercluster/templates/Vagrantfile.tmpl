@@ -8,8 +8,6 @@ Vagrant.configure("2") do |config|
             v.cpus = {{ getv "/cpu/machine/3" }}
             v.name = "{{ getv "/name/machine/3" }}"
         end
-        {{ getv "/name/machine/3" }}.vm.provision "shell",inline: "echo {{ getv "/name/machine/3" }} > /etc/hostname"
-        {{ getv "/name/machine/3" }}.vm.provision "shell",inline: "echo {{ getv "/ip/machine/3" }} {{ getv "/name/machine/3" }} >> /etc/hosts"
         {{ getv "/name/machine/3" }}.vm.provision "ansible" do |ansible|
             ansible.playbook = "playbook.yml"
         end
@@ -26,8 +24,6 @@ Vagrant.configure("2") do |config|
             v.cpus = {{ getv "/cpu/machine/4" }}
             v.name = "{{ getv "/name/machine/4" }}"
         end
-        {{ getv "/name/machine/4" }}.vm.provision "shell",inline: "echo {{ getv "/name/machine/4" }} > /etc/hostname"
-        {{ getv "/name/machine/4" }}.vm.provision "shell",inline: "echo {{ getv "/ip/machine/4" }} {{ getv "/name/machine/4" }} >> /etc/hosts"
         {{ getv "/name/machine/4" }}.vm.provision "ansible" do |ansible|
             ansible.playbook = "playbook.yml"
         end
