@@ -6,6 +6,38 @@
     - vars.yml
 
   tasks:
+    - name: Apped /etc/hostname 
+      shell: echo "{{ k8snode1_hostname }}" > /etc/hostname 
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300
+  ###----- SWARM JOIN
+    - name: Pulling from master swarm join script
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/swarm.sh /home/vagrant/
+
+    - name: Changing permissions
+      file:
+        path: /home/vagrant/swarm.sh
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+
+    - name: execute script
+      shell: /home/vagrant/swarm.sh
+
+  ###----- K8S JOIN
     - name: Pulling from master init script
       sudo_user: vagrant
       shell: rsync -e "ssh -i /home/vagrant/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@k8smaster.vm.dev.local:/home/vagrant/join.sh /home/vagrant/

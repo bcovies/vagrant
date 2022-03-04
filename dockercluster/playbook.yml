@@ -5,24 +5,7 @@
   vars_files:
     - vars.yml
 
-  pre_tasks:
-    - name: Update apt cache if needed
-      apt: 
-        update_cache: true 
-        cache_valid_time: 3600
-
-    - name: Install needed files
-      apt: 
-        update_cache: true 
-        name: 
-         - apt-transport-https
-         - ca-certificates
-         - curl
-         - vim
-         - git
-         - gnupg 
-         - lsb-release
-         - openjdk-11-jdk
+  # pre_tasks:
 
   handlers:
     - name: reload_daemon
@@ -44,6 +27,23 @@
       shell: systemctl restart containerd
 
   tasks:
+    - name: Update apt cache if needed
+      apt: 
+        update_cache: true 
+        cache_valid_time: 3600
+
+    - name: Install needed files
+      apt: 
+        update_cache: true 
+        name: 
+         - apt-transport-https
+         - ca-certificates
+         - curl
+         - vim
+         - git
+         - gnupg 
+         - lsb-release
+         - openjdk-11-jdk
   ###------     CONFIGS
     - name: Copy ssh files
       copy:

@@ -7,9 +7,51 @@
 
   pre_tasks:
     - name: Download kubeadm config images
-      shell: sudo kubeadm config images pull
+      shell: kubeadm config images pull
 
   tasks:
+    - name: Apped /etc/hostname 
+      shell: echo "{{ k8smaster_hostname }}" > /etc/hostname 
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300
+
+  ###---- Swarm
+    - name: Docker Swarm init
+      shell: docker swarm init --advertise-addr 192.168.2.4
+    
+    - name: Creates join script swarm.sh
+      copy:
+        dest: /home/vagrant/swarm.sh
+        content: |
+          #!/bin/bash
+          docker swarm join \
+            --token change_your_token_here \
+            192.168.2.4:2377
+
+    - name: Load vars
+      shell: docker swarm join-token --quiet worker
+      register: ps
+      # Print the shell task's stdout.
+    - debug: msg={{ ps.stdout }}
+
+    # Print all contents of the shell task's output.
+    - debug: var=ps
+
+    - name: replace script swarm.sh
+      shell: sed -i "s/\bchange_your_token_here\b/{{ ps.stdout }} /g" swarm.sh 
+
+  ###---- K8s
     - name: Kubeinit
       shell: |
         kubeadm init \
