@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECTS_TEMPLATES=( "rundeck" "jenkins" "dockercluster" )
+PROJECTS_TEMPLATES=( "rundeck" "jenkins" "k8scluster" )
 CONFD_BIN_FILE=confd-0.16.0-linux-amd64
 PATH_TMP_FILES=/tmp/confd/vagrant
 
