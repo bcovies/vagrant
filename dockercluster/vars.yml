@@ -14,6 +14,7 @@ ansible_python_interpreter: /usr/bin/python3
 
 k8smaster_hostname: k8smaster
 k8smaster_ip: 192.168.2.4
+k8snode1_ip: 192.168.2.5
 k8smaster_dns: k8smaster.vm.dev.local
 
 k8snode1_hostname: k8snode1

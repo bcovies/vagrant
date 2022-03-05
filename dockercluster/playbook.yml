@@ -35,7 +35,7 @@
 
     - name: Creates IdentityFile
       copy:
-        dest: "{{ k8s_system_etc_path }}/k8s.conf"
+        dest: "{{ vagrant_home_path }}/.ssh/config"
         content: |
           IdentityFile {{ vagrant_home_path }}/.ssh/admin
           

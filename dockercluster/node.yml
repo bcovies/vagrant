@@ -9,6 +9,9 @@
     - name: Apped /etc/hostname 
       shell: echo "{{ k8snode1_hostname }}" > /etc/hostname 
 
+    - name: Added node-ip in kubeadmi.conf
+      shell: sed -i 's/config.yaml"/config.yaml --node-ip={{ k8snode1_ip }}"/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
     - name: Reboot the machine
       shell: "sleep 5 && reboot"
 
