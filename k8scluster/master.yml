@@ -99,3 +99,16 @@
     - name: Append k8s join script with token
       sudo_user: vagrant
       shell: kubeadm token create --print-join-command >> {{ vagrant_home_path }}/join_k8s.sh
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300

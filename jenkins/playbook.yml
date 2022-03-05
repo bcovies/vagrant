@@ -63,3 +63,33 @@
 
     - name: append Authorized_keys
       shell: cat /home/jenkins/.ssh/admin.pub >> /home/jenkins/.ssh/authorized_keys
+
+    - name: Creates IdentityFile to ssh config with admin keys
+      copy:
+        dest: "/home/vagrant/.ssh/config"
+        content: |
+          IdentityFile /home/vagrant/.ssh/admin
+
+  ###----- OTHERS
+    - name: Remove /etc/resolv.conf with ubuntu configs
+      shell: rm -f /etc/resolv.conf
+
+    - name: Update /etc/resolv.conf with 
+      copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver {{ local_nameserver_1 }}
+          nameserver {{ local_nameserver_2 }}
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300
