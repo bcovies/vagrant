@@ -58,7 +58,7 @@
         kubeadm init \
           --apiserver-advertise-address={{ k8smaster_ip }} \
           --apiserver-cert-extra-sans={{ k8smaster_ip }} \
-          --pod-network-cidr=10.10.0.0/16 \
+          --pod-network-cidr={{ k8spodscidr }} \
           --node-name {{ k8smaster_hostname }} \
           --ignore-preflight-errors Swap
 

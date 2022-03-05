@@ -12,7 +12,7 @@
         update_cache: true 
         cache_valid_time: 3600
 
-    - name: Install needed files
+    - name: Install all apps for Docker, K8 & Jenkins
       apt: 
         update_cache: true 
         name: 
@@ -25,7 +25,7 @@
          - lsb-release
          - openjdk-11-jdk
          
-    - name: Copy ssh files generated with ./init.sh to virtual machine at "{{ vagrant_home_path }}/.ssh" 
+    - name: Copy ssh's files generated with ./init.sh script to VM at "{{ vagrant_home_path }}/.ssh" 
       copy:
         src: ../ssh_keys/
         dest: "{{ vagrant_home_path }}/.ssh" 
@@ -33,16 +33,19 @@
         group: vagrant
         mode: "0700"
 
-    - name: Creates IdentityFile
+    - name: Creates IdentityFile to ssh config with admin keys
       copy:
         dest: "{{ vagrant_home_path }}/.ssh/config"
         content: |
           IdentityFile {{ vagrant_home_path }}/.ssh/admin
-          
-    - name: disable swap
+
+    - name: Add admin keys to authorized_keys
+      shell: cat {{ vagrant_home_path }}/.ssh/admin.pub >> {{ vagrant_home_path }}/.ssh/authorized_keys
+
+    - name: disable swap for K8s requirements
       shell: swapoff -a
     
-    - name: modprobe
+    - name: modprobe for K8s requirements
       shell: modprobe br_netfilter
 
     - name: Creates "{{ k8s_modules_etc_path }}/k8s.conf" config file
@@ -58,7 +61,7 @@
           net.bridge.bridge-nf-call-ip6tables = 1
           net.bridge.bridge-nf-call-iptables = 1
 
-    - name: Restarts sysctl
+    - name: Restarts sysctl to apply configs
       shell: sysctl --system
 
     - name: Creates "{{ k8s_modules_etc_path }}/containerd.conf" config file
@@ -68,10 +71,10 @@
           overlay
           br_netfilter
 
-    - name: modprobe overlay
+    - name: modprobe overlay for K8s requirements
       shell: modprobe overlay
 
-    - name: modprobe br_netfilter
+    - name: modprobe br_netfilter for K8s requirements
       shell: modprobe br_netfilter
 
     - name: Creates "{{ k8s_system_etc_path }}/99-kubernetes-cri.conf" config file
@@ -82,12 +85,9 @@
           net.ipv4.ip_forward = 1
           net.bridge.bridge-nf-call-ip6tables = 1
 
-    - name: Restarts sysctl
+    - name: Restarts sysctl for K8s requirements
       shell: sysctl --system
 
-    - name: Add admin keys to authorized_keys
-      shell: cat {{ vagrant_home_path }}/.ssh/admin.pub >> {{ vagrant_home_path }}/.ssh/authorized_keys
-  
     - name: Add docker to apt-key
       apt_key:
         url: "{{ docker_apt_key }}"
@@ -163,7 +163,7 @@
         remote_src: yes
         state: directory
 
-    - name:  Create daemon json config file
+    - name:  Create daemon json config file for docker and K8s
       copy:
         dest: /etc/docker/daemon.json
         content: |
@@ -176,7 +176,7 @@
               "storage-driver": "overlay2"
             }
 
-    - name: Copy override file (exposes to 0.0.0.0)
+    - name: Copy override file (exposes to 0.0.0.0) for docker communication
       copy:
         dest: /etc/systemd/system/docker.service.d/override.conf
         content: |
@@ -192,14 +192,16 @@
     - name: Gives vagrant user docker permissions
       shell: usermod -aG docker vagrant
 
-    - name: Install docker-compose from official github repo
+    - name: Install docker-compose from official docker github repo with version {{ dockercompose_apt_version }}
       get_url:
-        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        url : https://github.com/docker/compose/releases/download/{{ dockercompose_apt_version }}/docker-compose-Linux-x86_64
         dest: /usr/local/bin/docker-compose
+        owner: root
+        group: docker
         mode: '0770'
 
   ###------     K8S
-    - name: Install kubelet, kubeadm && kubectl
+    - name: Install kubelet, kubeadm && kubectl with version {{ k8s_apt_version }}
       apt: 
         name: 
           - kubelet={{ k8s_apt_version }}
@@ -207,7 +209,7 @@
           - kubectl={{ k8s_apt_version }}
         state: present
 
-    - name: Apt-mark k8s
+    - name: Apt-mark K8s
       shell: apt-mark hold kubelet kubeadm kubectl   
 
     - name: Reload sysctl
@@ -217,12 +219,12 @@
         - restart_kubelet
 
   ###----- OTHERS
-    - name: Remove /etc/resolv.conf
+    - name: Remove /etc/resolv.conf with ubuntu configs
       shell: rm -f /etc/resolv.conf
 
-    - name: Update /etc/resolv.conf
+    - name: Update /etc/resolv.conf with 
       copy:
         dest: /etc/resolv.conf
         content: |
-          nameserver 192.168.2.50
-          nameserver 192.168.2.1
+          nameserver {{ local_nameserver_1 }}
+          nameserver {{ local_nameserver_2 }}
