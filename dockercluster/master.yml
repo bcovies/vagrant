@@ -80,8 +80,6 @@
         group: vagrant
         mode: "0750"
 
-
-
     - name: Kube apply Calico
       sudo_user: vagrant
       shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
@@ -89,6 +87,10 @@
     - name: Allow master node to execute pods
       sudo_user: vagrant
       shell: kubectl label node {{ k8smaster_hostname }} node-role.kubernetes.io/worker=worker-new
+      
+    - name: Remove taint (allow running pods)
+      sudo_user: vagrant
+      shell: kubectl taint nodes {{ k8smaster_hostname }} node-role.kubernetes.io/master-
 
     - name: Creates k8s join script
       sudo_user: vagrant
