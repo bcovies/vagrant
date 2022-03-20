@@ -1,0 +1,10 @@
+[template]
+src = "Vagrantfile.tmpl"
+dest = "/tmp/confd/vagrant/jenkins/Vagrantfile"
+keys = [
+    "/name/machine/2",
+    "/cpu/machine/2",
+    "/ram/machine/2",
+    "/ip/machine/2",
+    "/network/adapter",
+]

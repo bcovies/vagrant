@@ -1,0 +1,7 @@
+[template]
+src = "rundeck-config.tmpl"
+dest = "/tmp/confd/vagrant/rundeck/files/rundeck-config.properties"
+keys = [
+    "/name/machine/1",
+    "/domain/sufix",
+]

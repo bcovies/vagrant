@@ -1,6 +1,0 @@
----
-- hosts:
-    - jenkins
-  roles:
-    - common
-    - jenkins

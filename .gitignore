@@ -1,2 +1,6 @@
 .vagrant/
 .ssh/
+Vagrantfile
+files/
+ssh_keys/
+*.retry

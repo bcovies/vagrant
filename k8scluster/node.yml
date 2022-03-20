@@ -1,0 +1,96 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Apped /etc/hostname 
+      shell: echo "{{ k8snode1_hostname }}" > /etc/hostname 
+
+    - name: Added node-ip in kubeadmi.conf
+      shell: sed -i 's/config.yaml"/config.yaml --node-ip={{ k8snode1_ip }}"/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300
+        
+  ###----- SWARM JOIN
+    - name: Pulling from master swarm join script
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/join_swarm.sh {{ vagrant_home_path }}/
+
+    - name: Changing permissions
+      file:
+        path: "{{ vagrant_home_path }}/join_swarm.sh"
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+
+    - name: execute script
+      shell: "{{ vagrant_home_path }}/join_swarm.sh"
+
+  ###----- K8S JOIN
+    - name: Pulling from master init script
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/join_k8s.sh {{ vagrant_home_path }}/
+
+    - name: Changing permissions
+      file:
+        path: "{{ vagrant_home_path }}/join_k8s.sh"
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+
+    - name: execute script
+      shell: "{{ vagrant_home_path }}/join_k8s.sh"
+
+    - name: "Creates dir at {{ vagrant_home_path }}/.kube"
+      file:
+        path: "{{ vagrant_home_path }}/.kube"
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+        state: directory
+
+    - name: Pulling from master K8s configs
+      sudo_user: vagrant
+      shell: rsync -e "ssh -i {{ vagrant_home_path }}/.ssh/admin -o StrictHostKeyChecking=no" -auvz vagrant@{{ k8smaster_dns }}:{{ vagrant_home_path }}/.kube/config {{ vagrant_home_path }}/.kube/
+
+    - name: Changing permissions
+      file:
+        path: "{{ vagrant_home_path }}/.kube/config"
+        owner: vagrant
+        group: vagrant
+        mode: "0750"
+        remote_src: yes
+     
+    - name: Label node to execute pods
+      sudo_user: vagrant
+      shell: kubectl label node {{ k8snode1_hostname }} node-role.kubernetes.io/worker=worker-new
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300

@@ -107,4 +107,15 @@ vagrant_ansible_deploy/ansible/centos/roles/rundeck/tasks/main.yml
 
 ```
 
+https://github.com/scriptcamp/vagrant-kubeadm-kubernetes
 
+kubectl get pods -n kube-system
+kubectl get nodes
+kubectl cluster-info
+sudo ip link delete flannel.1
+
+sudo kubeadm init --apiserver-advertise-address=192.168.2.4 \
+  --apiserver-cert-extra-sans=192.168.2.4 \
+  --pod-network-cidr=10.10.0.0/16 \
+  --node-name k8smaster.vm.dev.local \
+  --ignore-preflight-errors Swap

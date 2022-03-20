@@ -1,0 +1,41 @@
+# framework.properties -
+#
+
+# ----------------------------------------------------------------
+# Rundeck server connection information
+# ----------------------------------------------------------------
+
+framework.server.name = {{ getv "/name/machine/1" }}
+framework.server.hostname = {{ getv "/name/machine/1" }}
+framework.server.port = 4440
+framework.server.url = http://{{ getv "/name/machine/1" }}.vm.{{ getv "/domain/sufix" }}:4440
+
+# ----------------------------------------------------------------
+# Installation locations
+# ----------------------------------------------------------------
+
+rdeck.base=/var/lib/rundeck
+
+framework.projects.dir=/var/lib/rundeck/projects
+framework.etc.dir=/etc/rundeck
+framework.var.dir=/var/lib/rundeck/var
+framework.tmp.dir=/var/lib/rundeck/var/tmp
+framework.logs.dir=/var/lib/rundeck/logs
+framework.libext.dir=/var/lib/rundeck/libext
+
+# ----------------------------------------------------------------
+# SSH defaults for node executor and file copier
+# ----------------------------------------------------------------
+
+framework.ssh.keypath = {{ getv "/admin/private/key" }}
+framework.ssh.user = {{ getv "/user/admin" }}
+
+# ssh connection timeout after a specified number of milliseconds.
+# "0" value means wait forever.
+framework.ssh.timeout = 0
+
+
+# ----------------------------------------------------------------
+# Auto generated server UUID: 68217ef9-32a0-4c82-bb49-878405713109
+# ----------------------------------------------------------------
+rundeck.server.uuid = 68217ef9-32a0-4c82-bb49-878405713109

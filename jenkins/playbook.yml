@@ -1,0 +1,95 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      apt: update_cache=true cache_valid_time=3600
+
+  handlers:
+    - name: Enable jenkins service
+      shell: systemctl enable jenkins
+
+    - name: Restart jenkins service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: jenkins
+
+  tasks:
+    - name: Install Java
+      apt: name=openjdk-11-jdk state=present
+
+    - name: Add jenkins apt-key
+      apt_key:
+        url: "{{ jenkins_apt_key }}"
+        state: present
+      
+    - name:  Add jenkins repository 1
+      apt_repository:
+        repo: deb "{{ jenkins_repo_url }}" binary/
+        state: present
+
+    - name: Update apt
+      apt: update_cache=true cache_valid_time=3600
+
+    - name: Install jenkins
+      apt: name=jenkins state=present
+      notify:
+        - Enable jenkins service
+        - Restart jenkins service
+        
+    - name: Copy ssh files
+      copy:
+        src: ../ssh_keys/
+        dest: /home/vagrant/.ssh
+        owner: vagrant
+        group: vagrant
+        mode: "0700"
+
+    - name: append Authorized_keys
+      shell: cat /home/vagrant/.ssh/admin.pub >> /home/vagrant/.ssh/authorized_keys
+
+    - name: Copy ssh files
+      copy:
+        src: ../ssh_keys/
+        dest: /home/jenkins/.ssh
+        owner: jenkins
+        group: jenkins
+        mode: "0700"
+
+    - name: append Authorized_keys
+      shell: cat /home/jenkins/.ssh/admin.pub >> /home/jenkins/.ssh/authorized_keys
+
+    - name: Creates IdentityFile to ssh config with admin keys
+      copy:
+        dest: "/home/vagrant/.ssh/config"
+        content: |
+          IdentityFile /home/vagrant/.ssh/admin
+
+  ###----- OTHERS
+    - name: Remove /etc/resolv.conf with ubuntu configs
+      shell: rm -f /etc/resolv.conf
+
+    - name: Update /etc/resolv.conf with 
+      copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver {{ local_nameserver_1 }}
+          nameserver {{ local_nameserver_2 }}
+
+    - name: Reboot the machine
+      shell: "sleep 5 && reboot"
+
+      async: 1
+      poll: 0
+
+    - name: Wait for the machine to come back online
+      wait_for_connection:
+        connect_timeout: 300
+        sleep: 5
+        delay: 5
+        timeout: 300

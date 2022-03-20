@@ -1,0 +1,9 @@
+[template]
+src = "framework.tmpl"
+dest = "/tmp/confd/vagrant/rundeck/files/framework.properties"
+keys = [
+    "/user/admin",
+    "/admin/private/key",
+    "/name/machine/1",
+    "/domain/sufix",
+]

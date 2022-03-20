@@ -1,0 +1,34 @@
+Vagrant.configure("2") do |config|
+    config.vm.define "{{ getv "/name/machine/3" }}" do |{{ getv "/name/machine/3" }}|
+        {{ getv "/name/machine/3" }}.vm.box = "ubuntu/focal64"
+        {{ getv "/name/machine/3" }}.vm.synced_folder ".", "/vagrant", disabled: true
+        {{ getv "/name/machine/3" }}.vm.network "public_network", ip: "{{ getv "/ip/machine/3" }}", bridge: "{{ getv "/network/adapter" }}"
+        {{ getv "/name/machine/3" }}.vm.provider "virtualbox" do |v|
+            v.memory= {{ getv "/ram/machine/3" }}
+            v.cpus = {{ getv "/cpu/machine/3" }}
+            v.name = "{{ getv "/name/machine/3" }}"
+        end
+        {{ getv "/name/machine/3" }}.vm.provision "ansible" do |ansible|
+            ansible.playbook = "playbook.yml"
+        end
+        {{ getv "/name/machine/3" }}.vm.provision "ansible" do |ansible|
+            ansible.playbook = "master.yml"
+        end
+    end
+    config.vm.define "{{ getv "/name/machine/4" }}" do |{{ getv "/name/machine/4" }}|
+        {{ getv "/name/machine/4" }}.vm.box = "ubuntu/focal64"
+        {{ getv "/name/machine/4" }}.vm.synced_folder ".", "/vagrant", disabled: true
+        {{ getv "/name/machine/4" }}.vm.network "public_network", ip: "{{ getv "/ip/machine/4" }}", bridge: "{{ getv "/network/adapter" }}"
+        {{ getv "/name/machine/4" }}.vm.provider "virtualbox" do |v|
+            v.memory= {{ getv "/ram/machine/4" }}
+            v.cpus = {{ getv "/cpu/machine/4" }}
+            v.name = "{{ getv "/name/machine/4" }}"
+        end
+        {{ getv "/name/machine/4" }}.vm.provision "ansible" do |ansible|
+            ansible.playbook = "playbook.yml"
+        end
+        {{ getv "/name/machine/4" }}.vm.provision "ansible" do |ansible|
+            ansible.playbook = "node.yml"
+        end
+    end  
+end
