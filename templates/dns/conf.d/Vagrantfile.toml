@@ -1,6 +1,6 @@
 [template]
 src = "Vagrantfile.tmpl"
-dest = "/tmp/confd/vagrant/rundeck/Vagrantfile"
+dest = "/tmp/confd/vagrant/dns/Vagrantfile"
 keys = [
     "/name/machine/1",
     "/cpu/machine/1",
